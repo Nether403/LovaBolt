@@ -285,9 +285,26 @@ Include ${functionalityTier ? functionalityTier.title.toLowerCase() : 'basic'} f
   
   // Auto-save functionality
   React.useEffect(() => {
-    const timer = setTimeout(saveProject, 1000);
+    const projectData = {
+      projectInfo,
+      selectedLayout,
+      selectedSpecialLayouts,
+      selectedDesignStyle,
+      selectedColorTheme,
+      selectedTypography,
+      selectedFunctionality,
+      selectedVisuals,
+      selectedAnimations,
+      currentStep,
+      savedAt: new Date().toISOString()
+    };
+    
+    const timer = setTimeout(() => {
+      localStorage.setItem('lovabolt-project', JSON.stringify(projectData));
+    }, 1000);
+    
     return () => clearTimeout(timer);
-  }, [projectInfo, selectedLayout, selectedSpecialLayouts, selectedDesignStyle, selectedColorTheme, selectedTypography, selectedFunctionality, selectedVisuals, selectedAnimations]);
+  }, [projectInfo, selectedLayout, selectedSpecialLayouts, selectedDesignStyle, selectedColorTheme, selectedTypography, selectedFunctionality, selectedVisuals, selectedAnimations, currentStep]);
   
   // Load project on mount
   React.useEffect(() => {

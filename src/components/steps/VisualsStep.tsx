@@ -1,7 +1,7 @@
 import React from 'react';
 import { useBoltBuilder } from '../../contexts/BoltBuilderContext';
 import { visualTypes } from '../../data/wizardData';
-import Button from '../ui/Button';
+import { Button } from '../ui/button';
 import VisualCard from '../cards/VisualCard';
 
 const VisualsStep: React.FC = () => {

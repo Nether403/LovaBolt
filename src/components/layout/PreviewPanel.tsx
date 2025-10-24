@@ -1,7 +1,7 @@
 import React from 'react';
 import { X } from 'lucide-react';
 import { useBoltBuilder } from '../../contexts/BoltBuilderContext';
-import Button from '../ui/Button';
+import { Button } from '../ui/button';
 
 interface PreviewPanelProps {
   isOpen: boolean;

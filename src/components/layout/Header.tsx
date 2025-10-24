@@ -2,7 +2,7 @@ import React from 'react';
 import { Menu, Monitor } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useBoltBuilder } from '../../contexts/BoltBuilderContext';
-import Button from '../ui/Button';
+import { Button } from '../ui/button';
 import ProgressBar from '../ui/ProgressBar';
 
 interface HeaderProps {

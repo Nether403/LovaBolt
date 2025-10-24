@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useBoltBuilder } from '../../contexts/BoltBuilderContext';
 import { animationTypes } from '../../data/wizardData';
-import Button from '../ui/Button';
+import { Button } from '../ui/button';
 import AnimationCard from '../cards/AnimationCard';
 
 const AnimationsStep: React.FC = () => {

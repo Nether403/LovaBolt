@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Copy, ExternalLink, Check, X } from 'lucide-react';
-import Button from '../ui/Button';
+import { Button } from '../ui/button';
 
 interface PromptModalProps {
   isOpen: boolean;

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useBoltBuilder } from '../../contexts/BoltBuilderContext';
-import Button from '../ui/Button';
+import { Button } from '../ui/button';
 import PromptModal from '../modals/PromptModal';
 
 const PreviewStep: React.FC = () => {

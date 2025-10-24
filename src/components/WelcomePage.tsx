@@ -6,6 +6,8 @@ const WelcomePage: React.FC = () => {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const [currentText, setCurrentText] = useState('');
+  const intervalRef = React.useRef<NodeJS.Timeout | null>(null);
+  const timeoutRef = React.useRef<NodeJS.Timeout | null>(null);
 
   const codeSnippets = [
     'const app = createApp();',
@@ -24,17 +26,25 @@ const WelcomePage: React.FC = () => {
     return codeSnippets[Math.floor(Math.random() * codeSnippets.length)];
   };
 
+  // Cleanup on unmount
+  React.useEffect(() => {
+    return () => {
+      if (intervalRef.current) clearInterval(intervalRef.current);
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    };
+  }, []);
+
   const handleGetStarted = () => {
     setIsLoading(true);
     let count = 0;
-    
-    const interval = setInterval(() => {
+
+    intervalRef.current = setInterval(() => {
       setCurrentText(getRandomSnippet());
       count++;
-      
+
       if (count >= 4) {
-        clearInterval(interval);
-        setTimeout(() => {
+        if (intervalRef.current) clearInterval(intervalRef.current);
+        timeoutRef.current = setTimeout(() => {
           setIsLoading(false);
           navigate('/wizard');
         }, 500);
@@ -56,14 +66,14 @@ const WelcomePage: React.FC = () => {
           <em>Advanced Prompt Generator</em>
         </p>
         <p className="text-lg text-gray-400 max-w-2xl mx-auto">
-          Create comprehensive website design prompts for AI development tools like 
-          <span className="text-blue-400 font-semibold"> Bolt.new</span> and 
+          Create comprehensive website design prompts for AI development tools like
+          <span className="text-blue-400 font-semibold"> Bolt.new</span> and
           <span className="text-purple-400 font-semibold"> Lovable.dev</span>
         </p>
       </div>
 
       {/* Features Preview */}
-      <div className="mb-12 max-w-4xl mx-auto animate-slide-up" style={{animationDelay: '0.2s'}}>
+      <div className="mb-12 max-w-4xl mx-auto animate-slide-up" style={{ animationDelay: '0.2s' }}>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-left">
           <div className="glass-card rounded-xl p-6 hover:scale-105 transition-all duration-300">
             <div className="w-12 h-12 bg-blue-500/20 rounded-lg flex items-center justify-center mb-4">
@@ -74,8 +84,8 @@ const WelcomePage: React.FC = () => {
             <h3 className="text-lg font-semibold text-white mb-2">Smart Wizard</h3>
             <p className="text-gray-300 text-sm">Intelligent step-by-step guidance through design decisions</p>
           </div>
-          
-          <div className="glass-card rounded-xl p-6 hover:scale-105 transition-all duration-300" style={{animationDelay: '0.1s'}}>
+
+          <div className="glass-card rounded-xl p-6 hover:scale-105 transition-all duration-300" style={{ animationDelay: '0.1s' }}>
             <div className="w-12 h-12 bg-purple-500/20 rounded-lg flex items-center justify-center mb-4">
               <svg className="w-6 h-6 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -85,8 +95,8 @@ const WelcomePage: React.FC = () => {
             <h3 className="text-lg font-semibold text-white mb-2">Live Preview</h3>
             <p className="text-gray-300 text-sm">Real-time visualization of your design choices</p>
           </div>
-          
-          <div className="glass-card rounded-xl p-6 hover:scale-105 transition-all duration-300" style={{animationDelay: '0.2s'}}>
+
+          <div className="glass-card rounded-xl p-6 hover:scale-105 transition-all duration-300" style={{ animationDelay: '0.2s' }}>
             <div className="w-12 h-12 bg-teal-500/20 rounded-lg flex items-center justify-center mb-4">
               <svg className="w-6 h-6 text-teal-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
@@ -99,7 +109,7 @@ const WelcomePage: React.FC = () => {
       </div>
 
       {/* CTA Button */}
-      <div className="animate-slide-up" style={{animationDelay: '0.4s'}}>
+      <div className="animate-slide-up" style={{ animationDelay: '0.4s' }}>
         <button
           onClick={handleGetStarted}
           disabled={isLoading}
@@ -129,12 +139,12 @@ const WelcomePage: React.FC = () => {
       </div>
 
       {/* Additional Info */}
-      <div className="mt-16 max-w-3xl mx-auto animate-slide-up" style={{animationDelay: '0.6s'}}>
+      <div className="mt-16 max-w-3xl mx-auto animate-slide-up" style={{ animationDelay: '0.6s' }}>
         <div className="glass-card rounded-xl p-8 text-center">
           <h2 className="text-2xl font-bold text-white mb-4">Why LovaBolt?</h2>
           <p className="text-gray-300 leading-relaxed">
-            Transform your website ideas into detailed, actionable prompts that AI development tools can understand perfectly. 
-            Our advanced wizard guides you through every design decision, ensuring your vision is captured with precision 
+            Transform your website ideas into detailed, actionable prompts that AI development tools can understand perfectly.
+            Our advanced wizard guides you through every design decision, ensuring your vision is captured with precision
             and translated into professional development requirements.
           </p>
         </div>

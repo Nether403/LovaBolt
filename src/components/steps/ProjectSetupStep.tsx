@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Info } from 'lucide-react';
 import { useBoltBuilder } from '../../contexts/BoltBuilderContext';
-import Button from '../ui/Button';
+import { Button } from '../ui/button';
 import InfoModal from '../modals/InfoModal';
 import DescriptionHelpModal from '../modals/DescriptionHelpModal';
 
