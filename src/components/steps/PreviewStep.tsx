@@ -11,8 +11,6 @@ const PreviewStep: React.FC = () => {
     selectedColorTheme,
     selectedTypography,
     selectedFunctionality,
-    selectedAnimations,
-    selectedVisuals,
     generatePrompt,
     generateBasicPrompt,
     setCurrentStep,

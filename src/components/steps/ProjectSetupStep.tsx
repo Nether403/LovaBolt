@@ -14,18 +14,18 @@ const ProjectSetupStep: React.FC = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     const newErrors: Record<string, string> = {};
     if (!projectInfo.name.trim()) newErrors.name = 'Please enter a project name';
     if (!projectInfo.description.trim()) newErrors.description = 'Please enter a project description';
-    
+
     setErrors(newErrors);
-    
+
     if (Object.keys(newErrors).length === 0) {
       setShowSuccess(true);
       setTimeout(() => {
         setShowSuccess(false);
-        setCurrentStep('layout');
+        setCurrentStep('functionality');
       }, 1500);
     }
   };
@@ -119,7 +119,8 @@ const ProjectSetupStep: React.FC = () => {
             onChange={(e) => setProjectInfo({ ...projectInfo, type: e.target.value as any })}
             className="w-full px-4 py-3 rounded-lg bg-white/5 border-white/20 text-white border
                      focus:ring-2 focus:ring-blue-500/50 focus:border-transparent
-                     transition-all duration-200"
+                     transition-all duration-200
+                     [&>option]:bg-gray-800 [&>option]:text-white"
           >
             <option value="Website">Website</option>
             <option value="Web App">Web App</option>
@@ -141,7 +142,8 @@ const ProjectSetupStep: React.FC = () => {
             onChange={(e) => setProjectInfo({ ...projectInfo, purpose: e.target.value })}
             className="w-full px-4 py-3 rounded-lg bg-white/5 border-white/20 text-white border
                      focus:ring-2 focus:ring-blue-500/50 focus:border-transparent
-                     transition-all duration-200"
+                     transition-all duration-200
+                     [&>option]:bg-gray-800 [&>option]:text-white"
           >
             <option value="Portfolio">Portfolio</option>
             <option value="Business">Business</option>

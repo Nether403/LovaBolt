@@ -1,12 +1,13 @@
-import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { BoltBuilderProvider } from './contexts/BoltBuilderContext';
+import ErrorBoundary from './components/ErrorBoundary';
 import WelcomePage from './components/WelcomePage';
 import WizardLayout from './components/WizardLayout';
 
 function App() {
   return (
-    <BoltBuilderProvider>
+    <ErrorBoundary>
+      <BoltBuilderProvider>
       <div className="min-h-screen bg-black overflow-hidden">
         {/* Animated Background */}
         <div className="absolute inset-0 bg-gradient-to-b from-blue-900/20 to-transparent" />
@@ -92,6 +93,7 @@ function App() {
         </div>
       </div>
     </BoltBuilderProvider>
+    </ErrorBoundary>
   );
 }
 

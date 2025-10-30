@@ -1,6 +1,7 @@
 import React from 'react';
 import { useBoltBuilder } from '../../contexts/BoltBuilderContext';
 import { visualTypes } from '../../data/wizardData';
+import { VisualElement } from '../../types';
 import { Button } from '../ui/button';
 import VisualCard from '../cards/VisualCard';
 
@@ -8,8 +9,8 @@ const VisualsStep: React.FC = () => {
   const { selectedVisuals, setSelectedVisuals, setCurrentStep } = useBoltBuilder();
 
   const handleVisualSelect = (typeId: string, optionId: string) => {
-    setSelectedVisuals(prev => [
-      ...prev.filter(v => v.id !== typeId),
+    setSelectedVisuals((prev: VisualElement[]) => [
+      ...prev.filter((v: VisualElement) => v.id !== typeId),
       { id: typeId, type: typeId, style: optionId }
     ]);
   };
@@ -19,7 +20,7 @@ const VisualsStep: React.FC = () => {
   };
 
   const handleContinue = () => {
-    setCurrentStep('functionality');
+    setCurrentStep('background');
   };
 
   return (
@@ -76,7 +77,7 @@ const VisualsStep: React.FC = () => {
           onClick={handleContinue}
           className="bg-teal-600 hover:bg-teal-700 text-white"
         >
-          Continue to Functionality
+          Continue to Background
         </Button>
       </div>
     </div>

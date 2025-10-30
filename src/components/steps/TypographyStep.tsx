@@ -1,6 +1,6 @@
 import React from 'react';
 import { useBoltBuilder } from '../../contexts/BoltBuilderContext';
-import { fonts, fontWeights, textAlignments, fontSizes, lineHeights } from '../../data/wizardData';
+import { fonts, fontWeights, textAlignments, fontSizes } from '../../data/wizardData';
 import { Button } from '../ui/button';
 import FontCard from '../cards/FontCard';
 
@@ -43,7 +43,8 @@ const TypographyStep: React.FC = () => {
             onChange={(e) => setSelectedTypography({ ...selectedTypography, headingWeight: e.target.value })}
             className="w-full px-4 py-2 rounded-lg bg-white/5 border-white/20 text-white border
                      focus:ring-2 focus:ring-blue-500/50 focus:border-transparent
-                     transition-all duration-200"
+                     transition-all duration-200
+                     [&>option]:bg-gray-800 [&>option]:text-white"
           >
             {fontWeights.map((weight) => (
               <option key={weight} value={weight}>{weight}</option>
@@ -58,7 +59,8 @@ const TypographyStep: React.FC = () => {
             onChange={(e) => setSelectedTypography({ ...selectedTypography, bodyWeight: e.target.value })}
             className="w-full px-4 py-2 rounded-lg bg-white/5 border-white/20 text-white border
                      focus:ring-2 focus:ring-blue-500/50 focus:border-transparent
-                     transition-all duration-200"
+                     transition-all duration-200
+                     [&>option]:bg-gray-800 [&>option]:text-white"
           >
             {fontWeights.map((weight) => (
               <option key={weight} value={weight}>{weight}</option>
@@ -73,7 +75,8 @@ const TypographyStep: React.FC = () => {
             onChange={(e) => setSelectedTypography({ ...selectedTypography, headingSize: e.target.value })}
             className="w-full px-4 py-2 rounded-lg bg-white/5 border-white/20 text-white border
                      focus:ring-2 focus:ring-blue-500/50 focus:border-transparent
-                     transition-all duration-200"
+                     transition-all duration-200
+                     [&>option]:bg-gray-800 [&>option]:text-white"
           >
             {fontSizes.map((size) => (
               <option key={size} value={size}>{size}</option>
@@ -88,7 +91,8 @@ const TypographyStep: React.FC = () => {
             onChange={(e) => setSelectedTypography({ ...selectedTypography, textAlignment: e.target.value })}
             className="w-full px-4 py-2 rounded-lg bg-white/5 border-white/20 text-white border
                      focus:ring-2 focus:ring-blue-500/50 focus:border-transparent
-                     transition-all duration-200"
+                     transition-all duration-200
+                     [&>option]:bg-gray-800 [&>option]:text-white"
           >
             {textAlignments.map((alignment) => (
               <option key={alignment} value={alignment}>{alignment}</option>

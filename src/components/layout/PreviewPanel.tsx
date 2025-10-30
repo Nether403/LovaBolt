@@ -1,7 +1,6 @@
 import React from 'react';
 import { X } from 'lucide-react';
 import { useBoltBuilder } from '../../contexts/BoltBuilderContext';
-import { Button } from '../ui/button';
 
 interface PreviewPanelProps {
   isOpen: boolean;
@@ -17,12 +16,10 @@ const PreviewPanel: React.FC<PreviewPanelProps> = ({ isOpen, onClose }) => {
     selectedTypography,
     selectedVisuals,
     selectedFunctionality,
-    selectedAnimations,
-    setCurrentStep
+    selectedAnimations
   } = useBoltBuilder();
 
   const getLayoutIcon = () => {
-    const iconClass = "w-8 h-8 text-blue-500/80";
     
     switch (selectedLayout?.title) {
       case 'Single Column':
@@ -286,8 +283,8 @@ const PreviewPanel: React.FC<PreviewPanelProps> = ({ isOpen, onClose }) => {
               {selectedAnimations.length > 0 ? (
                 <ul className="space-y-1">
                   {selectedAnimations.slice(0, 4).map((anim) => (
-                    <li key={anim} className="text-gray-300 text-sm">
-                      • {anim}
+                    <li key={anim.id} className="text-gray-300 text-sm">
+                      • {anim.title}
                     </li>
                   ))}
                   {selectedAnimations.length > 4 && (

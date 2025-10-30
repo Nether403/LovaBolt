@@ -1,90 +1,266 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useBoltBuilder } from '../../contexts/BoltBuilderContext';
-import { animationTypes } from '../../data/wizardData';
+import { reactBitsAnimations } from '../../data/reactBitsAnimations';
+import { AnimationOption } from '../../types';
 import { Button } from '../ui/button';
-import AnimationCard from '../cards/AnimationCard';
+import { ReactBitsCard } from '../cards/ReactBitsCard';
+import { ReactBitsModal } from '../modals/ReactBitsModal';
+import ErrorBoundary from '../ErrorBoundary';
+import { StepErrorFallback } from '../StepErrorFallback';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 
-const AnimationsStep: React.FC = () => {
+const ITEMS_PER_PAGE = 6;
+
+const AnimationsStepContent: React.FC = () => {
   const { selectedAnimations, setSelectedAnimations, setCurrentStep } = useBoltBuilder();
-  const [hoveredAnimation, setHoveredAnimation] = useState<string | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [modalState, setModalState] = useState<{
+    isOpen: boolean;
+    option: AnimationOption | null;
+  }>({
+    isOpen: false,
+    option: null,
+  });
+  const [dataLoadError, setDataLoadError] = useState<boolean>(false);
 
-  const handleAnimationSelect = (animationId: string) => {
-    setSelectedAnimations(prev => 
-      prev.includes(animationId)
-        ? prev.filter(id => id !== animationId)
-        : [...prev, animationId]
+  // Pagination logic
+  const totalPages = Math.ceil(reactBitsAnimations.length / ITEMS_PER_PAGE);
+  const paginatedAnimations = useMemo(() => {
+    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+    const endIndex = startIndex + ITEMS_PER_PAGE;
+    return reactBitsAnimations.slice(startIndex, endIndex);
+  }, [currentPage]);
+
+  // Memoize toggle handler to prevent unnecessary re-renders of child components
+  const handleToggle = React.useCallback((option: AnimationOption) => {
+    setSelectedAnimations((prev) =>
+      prev.some((item) => item.id === option.id)
+        ? prev.filter((item) => item.id !== option.id)
+        : [...prev, option]
     );
-  };
+  }, [setSelectedAnimations]);
 
-  const handleContinue = () => {
+  // Memoize view details handler
+  const handleViewDetails = React.useCallback((e: React.MouseEvent, option: AnimationOption) => {
+    e.stopPropagation();
+    setModalState({ isOpen: true, option });
+  }, []);
+
+  // Memoize navigation handlers
+  const handleContinue = React.useCallback(() => {
     setCurrentStep('preview');
-  };
+  }, [setCurrentStep]);
+
+  const handleRetry = React.useCallback(() => {
+    setDataLoadError(false);
+  }, []);
+
+  const handleSkip = React.useCallback(() => {
+    setCurrentStep('preview');
+  }, [setCurrentStep]);
+
+  // Check if data loaded successfully
+  React.useEffect(() => {
+    try {
+      if (!reactBitsAnimations || reactBitsAnimations.length === 0) {
+        console.error('AnimationsStep: Failed to load animation options');
+        setDataLoadError(true);
+      }
+    } catch (error) {
+      console.error('AnimationsStep: Error checking data:', error);
+      setDataLoadError(true);
+    }
+  }, []);
+
+  // Show error fallback if data failed to load
+  if (dataLoadError) {
+    return (
+      <StepErrorFallback
+        stepName="UI/UX Animations"
+        onRetry={handleRetry}
+        onSkip={handleSkip}
+      />
+    );
+  }
 
   return (
     <div className="space-y-8">
+      {/* Screen reader announcement for selection changes */}
+      <div 
+        role="status" 
+        aria-live="polite" 
+        aria-atomic="true"
+        className="sr-only"
+      >
+        {selectedAnimations.length === 0 
+          ? 'No animations selected' 
+          : `${selectedAnimations.length} animation${selectedAnimations.length === 1 ? '' : 's'} selected`}
+      </div>
+
       {/* Header */}
-      <div>
-        <h2 className="text-3xl font-bold mb-2 text-white">UI/UX Animations</h2>
-        <p className="text-gray-300">Select animations and micro-interactions to enhance user experience.</p>
+      <div className="animate-slide-up">
+        <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-2 text-white">UI/UX Animations</h2>
+        <p className="text-sm sm:text-base text-gray-300" aria-live="polite">
+          Select animations and micro-interactions to enhance user experience. <span className="text-teal-400 font-semibold">{selectedAnimations.length}</span> selected.
+        </p>
+      </div>
+
+      {/* Info banner */}
+      <div className="relative overflow-hidden rounded-xl animate-slide-up">
+        <div className="absolute inset-0 glass-card" />
+        <div className="relative p-4 flex items-center gap-3">
+          <div className="bg-teal-500/20 p-2 rounded-lg">
+            <svg className="w-5 h-5 text-teal-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          </div>
+          <div className="flex-1">
+            <p className="text-sm text-gray-300">
+              Live animated previews • {reactBitsAnimations.length} animations available • Page {currentPage} of {totalPages}
+            </p>
+          </div>
+        </div>
       </div>
 
       {/* Animation Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {animationTypes.map((animation) => {
-          const isSelected = selectedAnimations.includes(animation.id);
-          const isHovered = hoveredAnimation === animation.id;
-          
-          return (
-            <AnimationCard
-              key={animation.id}
-              animation={animation}
-              selected={isSelected}
-              isActive={isHovered || isSelected}
-              onClick={() => handleAnimationSelect(animation.id)}
-              onMouseEnter={() => setHoveredAnimation(animation.id)}
-              onMouseLeave={() => setHoveredAnimation(null)}
-            />
-          );
-        })}
+      <div 
+        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+        role="group"
+        aria-label="Animation effects selection. Multiple selection allowed."
+      >
+        {paginatedAnimations.map((option) => (
+          <ReactBitsCard
+            key={option.id}
+            option={option}
+            isSelected={selectedAnimations.some((item) => item.id === option.id)}
+            onSelect={() => handleToggle(option)}
+            onViewDetails={(e) => handleViewDetails(e, option)}
+            showPreview={true}
+          />
+        ))}
       </div>
 
-      {/* Selected Animations Summary */}
+      {/* Pagination Controls */}
+      {totalPages > 1 && (
+        <div className="flex items-center justify-center gap-4">
+          <Button
+            onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
+            disabled={currentPage === 1}
+            variant="outline"
+            className="flex items-center gap-2"
+          >
+            <ChevronLeft className="w-4 h-4" />
+            Previous
+          </Button>
+          
+          <div className="flex items-center gap-2">
+            {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+              <button
+                key={page}
+                onClick={() => setCurrentPage(page)}
+                className={`
+                  w-10 h-10 rounded-lg transition-all duration-200
+                  ${currentPage === page
+                    ? 'bg-teal-600 text-white font-semibold'
+                    : 'glass-card text-gray-300 hover:text-white hover:bg-white/10'
+                  }
+                `}
+                aria-label={`Go to page ${page}`}
+                aria-current={currentPage === page ? 'page' : undefined}
+              >
+                {page}
+              </button>
+            ))}
+          </div>
+
+          <Button
+            onClick={() => setCurrentPage((prev) => Math.min(totalPages, prev + 1))}
+            disabled={currentPage === totalPages}
+            variant="outline"
+            className="flex items-center gap-2"
+          >
+            Next
+            <ChevronRight className="w-4 h-4" />
+          </Button>
+        </div>
+      )}
+
+      {/* Selected CLI Commands Display */}
       {selectedAnimations.length > 0 && (
-        <div className="glass-card rounded-lg p-6">
-          <h3 className="text-lg font-semibold mb-4 text-white">Selected Animations</h3>
-          <div className="flex flex-wrap gap-2">
-            {selectedAnimations.map((animId) => {
-              const animation = animationTypes.find(a => a.id === animId);
-              return animation ? (
-                <span 
-                  key={animId}
-                  className="px-3 py-1 bg-teal-500/20 text-teal-300 rounded-full text-sm border border-teal-500/30"
-                >
-                  {animation.title}
-                </span>
-              ) : null;
-            })}
+        <div className="relative overflow-hidden rounded-xl animate-slide-up">
+          <div className="absolute inset-0 glass-card transition-all duration-300" />
+          <div className="absolute inset-0 bg-gradient-to-br from-teal-500/5 to-transparent pointer-events-none" />
+          <div className="relative p-4 sm:p-6">
+            <h3 className="text-base sm:text-lg font-semibold text-white mb-4">
+              Installation Commands ({selectedAnimations.length})
+            </h3>
+            <div className="space-y-2 max-h-64 overflow-y-auto custom-scrollbar">
+              {selectedAnimations.map((anim) => (
+                <code key={anim.id} className="block text-xs sm:text-sm text-teal-400 break-all p-2 bg-gray-900/30 rounded transition-colors duration-200 hover:bg-gray-900/50">
+                  {anim.cliCommand}
+                </code>
+              ))}
+            </div>
           </div>
         </div>
       )}
 
       {/* Navigation */}
-      <div className="flex justify-between pt-8">
+      <div className="flex flex-col sm:flex-row justify-between gap-4 pt-8">
         <Button 
-          onClick={() => setCurrentStep('functionality')}
+          onClick={React.useCallback(() => setCurrentStep('functionality'), [setCurrentStep])}
           variant="outline"
+          className="w-full sm:w-auto transition-all duration-200 hover:scale-105"
         >
           Back to Functionality
         </Button>
         
         <Button 
           onClick={handleContinue}
-          className="bg-teal-600 hover:bg-teal-700 text-white"
+          className="bg-teal-600 hover:bg-teal-700 text-white w-full sm:w-auto transition-all duration-200 hover:scale-105"
         >
           Continue to Preview
         </Button>
       </div>
+
+      {/* Modal - wrapped in ErrorBoundary to prevent crashes */}
+      <ErrorBoundary
+        fallback={
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
+            <div className="glass-card rounded-xl max-w-md w-full p-6 text-center">
+              <p className="text-white mb-4">Unable to display details</p>
+              <Button
+                onClick={React.useCallback(() => setModalState({ isOpen: false, option: null }), [])}
+                variant="outline"
+              >
+                Close
+              </Button>
+            </div>
+          </div>
+        }
+      >
+        <ReactBitsModal
+          isOpen={modalState.isOpen}
+          onClose={React.useCallback(() => setModalState({ isOpen: false, option: null }), [])}
+          option={modalState.option}
+        />
+      </ErrorBoundary>
     </div>
+  );
+};
+
+const AnimationsStep: React.FC = () => {
+  return (
+    <ErrorBoundary
+      fallback={
+        <StepErrorFallback
+          stepName="UI/UX Animations"
+          onSkip={() => (window.location.hash = '#/preview')}
+        />
+      }
+    >
+      <AnimationsStepContent />
+    </ErrorBoundary>
   );
 };
 

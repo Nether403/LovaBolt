@@ -6,9 +6,36 @@ import DesignStyleStep from '../steps/DesignStyleStep';
 import ColorThemeStep from '../steps/ColorThemeStep';
 import TypographyStep from '../steps/TypographyStep';
 import VisualsStep from '../steps/VisualsStep';
+import BackgroundStep from '../steps/BackgroundStepEnhanced';
+import ComponentsStep from '../steps/ComponentsStep';
 import FunctionalityStep from '../steps/FunctionalityStep';
 import AnimationsStep from '../steps/AnimationsStep';
 import PreviewStep from '../steps/PreviewStep';
+
+/**
+ * PERFORMANCE OPTIMIZATION NOTE: Code Splitting
+ * 
+ * If bundle size becomes a concern, consider implementing code splitting for step components
+ * using React.lazy() and Suspense. This will load step components on-demand rather than
+ * bundling them all upfront.
+ * 
+ * Example implementation:
+ * 
+ * const ProjectSetupStep = React.lazy(() => import('../steps/ProjectSetupStep'));
+ * const LayoutStep = React.lazy(() => import('../steps/LayoutStep'));
+ * // ... other steps
+ * 
+ * Then wrap renderCurrentStep() in a Suspense boundary:
+ * 
+ * <Suspense fallback={<div className="text-white">Loading...</div>}>
+ *   {renderCurrentStep()}
+ * </Suspense>
+ * 
+ * This optimization should only be implemented if:
+ * 1. Bundle size exceeds acceptable limits (>500KB for main bundle)
+ * 2. Initial load time is negatively impacted
+ * 3. Performance metrics indicate a need for optimization
+ */
 
 const MainContent: React.FC = () => {
   const { currentStep } = useBoltBuilder();
@@ -35,6 +62,10 @@ const MainContent: React.FC = () => {
         return <TypographyStep />;
       case 'visuals':
         return <VisualsStep />;
+      case 'background':
+        return <BackgroundStep />;
+      case 'components':
+        return <ComponentsStep />;
       case 'functionality':
         return <FunctionalityStep />;
       case 'animations':

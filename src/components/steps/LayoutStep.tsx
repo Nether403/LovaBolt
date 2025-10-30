@@ -1,6 +1,7 @@
 import React from 'react';
 import { useBoltBuilder } from '../../contexts/BoltBuilderContext';
 import { layoutOptions } from '../../data/wizardData';
+import { LayoutOption } from '../../types';
 import { Button } from '../ui/button';
 import LayoutCard from '../cards/LayoutCard';
 
@@ -20,9 +21,9 @@ const LayoutStep: React.FC = () => {
     if (isPrimary) {
       setSelectedLayout(layout);
     } else {
-      setSelectedSpecialLayouts(prev => 
-        prev.some(l => l.id === layout.id)
-          ? prev.filter(l => l.id !== layout.id)
+      setSelectedSpecialLayouts((prev: LayoutOption[]) => 
+        prev.some((l: LayoutOption) => l.id === layout.id)
+          ? prev.filter((l: LayoutOption) => l.id !== layout.id)
           : [...prev, layout]
       );
     }
@@ -64,10 +65,10 @@ const LayoutStep: React.FC = () => {
           </div>
         </div>
 
-        {/* Special Layout Features */}
+        {/* Additional Layout Features */}
         <div>
           <h3 className="text-xl font-semibold mb-2 text-white/90">
-            Special Features <span className="text-sm font-normal text-white/60">(Select Multiple)</span>
+            Additional Layout Features <span className="text-sm font-normal text-white/60">(Select Multiple)</span>
           </h3>
           <p className="text-gray-300 text-sm mb-6">Add these layout components to enhance your website</p>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -87,10 +88,10 @@ const LayoutStep: React.FC = () => {
       {/* Navigation */}
       <div className="flex justify-between pt-8">
         <Button 
-          onClick={() => setCurrentStep('project-setup')}
+          onClick={() => setCurrentStep('functionality')}
           variant="outline"
         >
-          Back to Project Setup
+          Back to Functionality
         </Button>
         
         <Button 

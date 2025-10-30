@@ -26,15 +26,17 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
   };
 
   const navigationItems = [
-    { id: 'project-setup', label: 'Project Setup', icon: <Settings size={20} /> },
-    { id: 'layout', label: 'Layout', icon: <LayoutGrid size={20} /> },
-    { id: 'design-style', label: 'Design Style', icon: <Palette size={20} /> },
-    { id: 'color-theme', label: 'Color Theme', icon: <Palette size={20} /> },
-    { id: 'typography', label: 'Typography', icon: <Type size={20} /> },
-    { id: 'visuals', label: 'Visuals', icon: <Image size={20} /> },
-    { id: 'functionality', label: 'Functionality', icon: <FunctionSquare size={20} /> },
-    { id: 'animations', label: 'UI/UX Animations', icon: <Play size={20} /> },
-    { id: 'preview', label: 'Preview', icon: <Monitor size={20} /> }
+    { id: 'project-setup', label: 'Project Setup', number: 1, icon: <Settings size={20} /> },
+    { id: 'functionality', label: 'Functionality', number: 2, icon: <FunctionSquare size={20} /> },
+    { id: 'layout', label: 'Layout', number: 3, icon: <LayoutGrid size={20} /> },
+    { id: 'design-style', label: 'Design Style', number: 4, icon: <Palette size={20} /> },
+    { id: 'color-theme', label: 'Color Theme', number: 5, icon: <Palette size={20} /> },
+    { id: 'typography', label: 'Typography', number: 6, icon: <Type size={20} /> },
+    { id: 'visuals', label: 'Visuals', number: 7, icon: <Image size={20} /> },
+    { id: 'background', label: 'Background', number: 8, icon: <Image size={20} /> },
+    { id: 'components', label: 'Components', number: 9, icon: <LayoutGrid size={20} /> },
+    { id: 'animations', label: 'Animations', number: 10, icon: <Play size={20} /> },
+    { id: 'preview', label: 'Preview', number: 11, icon: <Monitor size={20} /> }
   ];
 
   return (
@@ -84,6 +86,9 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
                     `}
                     onClick={() => handleStepChange(item.id)}
                   >
+                    <span className="mr-3 flex items-center justify-center w-6 h-6 rounded-full bg-white/10 text-xs font-semibold">
+                      {item.number}
+                    </span>
                     <span className="mr-3">{item.icon}</span>
                     <span>{item.label}</span>
                   </button>

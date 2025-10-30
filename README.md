@@ -33,15 +33,20 @@ LovaBolt is an intelligent prompt generator designed specifically for AI-powered
 ## ✨ Features
 
 ### 🧙‍♂️ **Intelligent Wizard**
-Step-by-step guidance through 8 comprehensive sections:
+Step-by-step guidance through 11 comprehensive sections:
 - **Project Setup**: Define your project's core identity
 - **Layout Selection**: Choose from 10+ layout patterns
 - **Design Style**: Pick from 9 modern design aesthetics
 - **Color Theme**: Select or customize your color palette
 - **Typography**: Fine-tune fonts and text styling
 - **Visual Elements**: Choose icons, illustrations, and imagery
+- **Background Effects** ✨: Select from 31 react-bits backgrounds
+- **UI Components** ✨: Choose from 37 react-bits components
 - **Functionality**: Select feature tiers and technical requirements
-- **Animations**: Add UI/UX micro-interactions
+- **Animations** ✨: Add from 25 react-bits animations
+- **Preview**: Review and generate your detailed prompt
+
+✨ = **New React-Bits Integration** - 93 production-ready components!
 
 ### 📊 **Live Preview**
 Real-time visualization of your selections with:
@@ -123,9 +128,13 @@ The optimized build will be in the `dist` folder.
 5. **Choose Colors**: Use preset themes or create custom palette
 6. **Configure Typography**: Select fonts and text styling
 7. **Add Visuals**: Choose icon styles, illustrations, and imagery
-8. **Select Functionality**: Pick feature tier and technical requirements
-9. **Enable Animations**: Add micro-interactions and transitions
-10. **Generate Prompt**: Review and copy your detailed prompt
+8. **Select Background** ✨: Pick from 31 stunning background effects
+9. **Choose Components** ✨: Select from 37 UI components
+10. **Select Functionality**: Pick feature tier and technical requirements
+11. **Enable Animations** ✨: Add from 25 animation effects
+12. **Generate Prompt**: Review and copy your detailed prompt
+
+✨ = **New React-Bits Integration** - Professional components with installation commands!
 
 ### Using Generated Prompts
 
@@ -171,34 +180,48 @@ The optimized build will be in the `dist` folder.
 lovabolt/
 ├── src/
 │   ├── components/
-│   │   ├── cards/          # Reusable card components
+│   │   ├── cards/
+│   │   │   └── ReactBitsCard.tsx      # ✨ Reusable react-bits card
 │   │   ├── layout/         # Layout components (Header, Sidebar, etc.)
-│   │   ├── modals/         # Modal dialogs
-│   │   ├── steps/          # Wizard step components
+│   │   ├── modals/
+│   │   │   └── ReactBitsModal.tsx     # ✨ React-bits detail modal
+│   │   ├── steps/
+│   │   │   ├── BackgroundStep.tsx     # ✨ NEW: Background selection
+│   │   │   ├── ComponentsStep.tsx     # ✨ NEW: Component selection
+│   │   │   ├── AnimationsStep.tsx     # ✨ UPDATED: React-bits animations
+│   │   │   └── ...                    # Other wizard steps
 │   │   ├── ui/             # shadcn/ui components
 │   │   ├── ErrorBoundary.tsx
+│   │   ├── StepErrorFallback.tsx      # ✨ Error fallback component
 │   │   ├── WelcomePage.tsx
 │   │   └── WizardLayout.tsx
 │   ├── contexts/
-│   │   └── BoltBuilderContext.tsx  # Global state management
+│   │   └── BoltBuilderContext.tsx     # Global state (updated with react-bits)
 │   ├── data/
-│   │   └── wizardData.ts   # Static data (layouts, styles, etc.)
+│   │   ├── reactBitsData.ts           # ✨ NEW: 93 react-bits components
+│   │   └── wizardData.ts              # Static data (layouts, styles, etc.)
 │   ├── hooks/
 │   │   └── use-toast.ts    # Toast notifications
 │   ├── lib/
 │   │   └── utils.ts        # Utility functions
 │   ├── types/
-│   │   └── index.ts        # TypeScript type definitions
+│   │   └── index.ts        # TypeScript types (updated with react-bits)
 │   ├── App.tsx
 │   ├── main.tsx
 │   └── index.css
+├── .kiro/
+│   └── specs/
+│       └── react-bits-integration/    # ✨ Integration spec documents
 ├── public/
+├── REACT_BITS_INTEGRATION.md          # ✨ NEW: Comprehensive documentation
 ├── package.json
 ├── tsconfig.json
 ├── vite.config.ts
 ├── tailwind.config.js
 ├── README.md
 └── ROADMAP.md
+
+✨ = New or updated for React-Bits integration
 ```
 
 ---
@@ -256,6 +279,28 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - 💬 Discussions: [GitHub Discussions](https://github.com/yourusername/lovabolt/discussions)
 
 ---
+
+## 📚 Documentation
+
+- **[React-Bits Integration Guide](REACT_BITS_INTEGRATION.md)** - Complete documentation for the 93-component integration
+- **[Roadmap](ROADMAP.md)** - Planned features and improvements
+- **[Contributing Guide](CONTRIBUTING.md)** - How to contribute to the project
+
+### React-Bits Integration
+
+LovaBolt now includes 93 production-ready React components from [React-Bits](https://reactbits.dev):
+
+- **31 Backgrounds**: Aurora, Particles, Meteors, Globe, and more
+- **37 UI Components**: Carousel, Cards, Timeline, Modals, and more  
+- **25 Animations**: Blob Cursor, Magnetic Button, Scroll Reveal, and more
+
+Each component includes:
+- ✅ Installation command (npx shadcn)
+- ✅ Dependencies list
+- ✅ Usage examples
+- ✅ Detailed descriptions
+
+See [REACT_BITS_INTEGRATION.md](REACT_BITS_INTEGRATION.md) for complete documentation.
 
 ## 🗺️ Roadmap
 

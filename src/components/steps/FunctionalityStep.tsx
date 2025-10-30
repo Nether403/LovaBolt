@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { ChevronRight } from 'lucide-react';
 import { useBoltBuilder } from '../../contexts/BoltBuilderContext';
 import { functionalityOptions } from '../../data/wizardData';
+import { FunctionalityOption } from '../../types';
 import { Button } from '../ui/button';
 import FunctionalityModal from '../modals/FunctionalityModal';
 
@@ -16,14 +17,14 @@ const FunctionalityStep: React.FC = () => {
     const option = functionalityOptions.find(o => o.id === optionId);
     if (!option) return;
 
-    setSelectedFunctionality(prev => {
+    setSelectedFunctionality((prev: FunctionalityOption[]) => {
       if (option.category === 'functionality') {
         // Replace existing functionality tier
-        return [...prev.filter(item => !item.tier), option];
+        return [...prev.filter((item: FunctionalityOption) => !item.tier), option];
       } else {
         // Toggle technical requirement
-        return prev.some(item => item.id === optionId)
-          ? prev.filter(item => item.id !== optionId)
+        return prev.some((item: FunctionalityOption) => item.id === optionId)
+          ? prev.filter((item: FunctionalityOption) => item.id !== optionId)
           : [...prev, option];
       }
     });
@@ -35,7 +36,7 @@ const FunctionalityStep: React.FC = () => {
   };
 
   const handleContinue = () => {
-    setCurrentStep('animations');
+    setCurrentStep('layout');
   };
 
   const tiers = ['basic', 'standard', 'advanced', 'enterprise'];
@@ -150,17 +151,17 @@ const FunctionalityStep: React.FC = () => {
       {/* Navigation */}
       <div className="flex justify-between pt-8">
         <Button 
-          onClick={() => setCurrentStep('visuals')}
+          onClick={() => setCurrentStep('project-setup')}
           variant="outline"
         >
-          Back to Visuals
+          Back to Project Setup
         </Button>
         
         <Button 
           onClick={handleContinue}
           className="bg-teal-600 hover:bg-teal-700 text-white"
         >
-          Continue to Animations
+          Continue to Layout
         </Button>
       </div>
 

@@ -6,8 +6,11 @@ import {
   ColorTheme, 
   Typography, 
   VisualElement, 
-  FunctionalityOption, 
-  AnimationType 
+  FunctionalityOption,
+  BackgroundOption,
+  ComponentOption,
+  AnimationOption,
+  BackgroundSelection
 } from '../types';
 
 interface BoltBuilderContextType {
@@ -23,7 +26,7 @@ interface BoltBuilderContextType {
   selectedLayout: LayoutOption | null;
   setSelectedLayout: (layout: LayoutOption | null) => void;
   selectedSpecialLayouts: LayoutOption[];
-  setSelectedSpecialLayouts: (layouts: LayoutOption[]) => void;
+  setSelectedSpecialLayouts: React.Dispatch<React.SetStateAction<LayoutOption[]>>;
   
   // Design Style
   selectedDesignStyle: DesignStyle | null;
@@ -39,15 +42,27 @@ interface BoltBuilderContextType {
   
   // Functionality
   selectedFunctionality: FunctionalityOption[];
-  setSelectedFunctionality: (functionality: FunctionalityOption[]) => void;
+  setSelectedFunctionality: React.Dispatch<React.SetStateAction<FunctionalityOption[]>>;
   
   // Visuals
   selectedVisuals: VisualElement[];
-  setSelectedVisuals: (visuals: VisualElement[]) => void;
+  setSelectedVisuals: React.Dispatch<React.SetStateAction<VisualElement[]>>;
   
-  // Animations
-  selectedAnimations: AnimationType[];
-  setSelectedAnimations: (animations: AnimationType[]) => void;
+  // React-Bits: Background
+  selectedBackground: BackgroundOption | null;
+  setSelectedBackground: (background: BackgroundOption | null) => void;
+  
+  // Background Selection (new comprehensive type)
+  backgroundSelection: BackgroundSelection | null;
+  setBackgroundSelection: (selection: BackgroundSelection | null) => void;
+  
+  // React-Bits: Components
+  selectedComponents: ComponentOption[];
+  setSelectedComponents: React.Dispatch<React.SetStateAction<ComponentOption[]>>;
+  
+  // React-Bits: Animations
+  selectedAnimations: AnimationOption[];
+  setSelectedAnimations: React.Dispatch<React.SetStateAction<AnimationOption[]>>;
   
   // Progress
   progress: number;
@@ -99,7 +114,14 @@ export const BoltBuilderProvider: React.FC<{ children: ReactNode }> = ({ childre
   const [selectedTypography, setSelectedTypography] = useState<Typography>(defaultTypography);
   const [selectedFunctionality, setSelectedFunctionality] = useState<FunctionalityOption[]>([]);
   const [selectedVisuals, setSelectedVisuals] = useState<VisualElement[]>([]);
-  const [selectedAnimations, setSelectedAnimations] = useState<AnimationType[]>([]);
+  
+  // React-Bits state
+  const [selectedBackground, setSelectedBackground] = useState<BackgroundOption | null>(null);
+  const [selectedComponents, setSelectedComponents] = useState<ComponentOption[]>([]);
+  const [selectedAnimations, setSelectedAnimations] = useState<AnimationOption[]>([]);
+  
+  // Background selection state (new comprehensive type)
+  const [backgroundSelection, setBackgroundSelection] = useState<BackgroundSelection | null>(null);
   
   // Prompt state
   const [promptText, setPromptText] = useState('');
@@ -108,7 +130,7 @@ export const BoltBuilderProvider: React.FC<{ children: ReactNode }> = ({ childre
   // Calculate progress
   const progress = (() => {
     let completed = 0;
-    const totalSteps = 8;
+    const totalSteps = 10;
     
     if (projectInfo.name && projectInfo.description && projectInfo.purpose) completed++;
     if (selectedLayout) completed++;
@@ -116,6 +138,8 @@ export const BoltBuilderProvider: React.FC<{ children: ReactNode }> = ({ childre
     if (selectedColorTheme) completed++;
     if (selectedTypography.fontFamily) completed++;
     if (selectedVisuals.length > 0) completed++;
+    if (selectedBackground) completed++;
+    if (selectedComponents.length > 0) completed++;
     if (selectedFunctionality.length > 0) completed++;
     if (selectedAnimations.length > 0) completed++;
     
@@ -135,7 +159,88 @@ export const BoltBuilderProvider: React.FC<{ children: ReactNode }> = ({ childre
       return `${visual.type}: ${visual.style}`;
     });
     
-    const animations = selectedAnimations.map(anim => anim).filter(Boolean);
+    // Background section (Section 7)
+    const backgroundSection = selectedBackground
+      ? `## 7. Background Effect
+- **Selected Background:** ${selectedBackground.title}
+- **Description:** ${selectedBackground.description}
+- **Dependencies:** ${selectedBackground.dependencies.join(', ')}
+- **Installation:** \`${selectedBackground.cliCommand}\`
+`
+      : `## 7. Background Effect
+- **Selected Background:** None
+`;
+
+    // UI Components section (Section 8)
+    const componentsSection = selectedComponents.length > 0
+      ? `## 8. UI Components
+**Selected Components (${selectedComponents.length}):**
+
+${selectedComponents.map(comp => `
+### ${comp.title}
+- **Description:** ${comp.description}
+- **Dependencies:** ${comp.dependencies.join(', ')}
+- **Installation:** \`${comp.cliCommand}\`
+${comp.codeSnippet ? `- **Usage:**
+\`\`\`tsx
+${comp.codeSnippet}
+\`\`\`
+` : ''}`).join('\n')}
+`
+      : `## 8. UI Components
+- No additional UI components selected
+`;
+
+    // UI/UX Animations section (Section 9)
+    const animationsSection = selectedAnimations.length > 0
+      ? `## 9. UI/UX Animations
+**Selected Animations (${selectedAnimations.length}):**
+
+${selectedAnimations.map(anim => `
+### ${anim.title}
+- **Description:** ${anim.description}
+- **Dependencies:** ${anim.dependencies.join(', ')}
+- **Installation:** \`${anim.cliCommand}\`
+`).join('\n')}
+`
+      : `## 9. UI/UX Animations
+- Standard animations and transitions
+`;
+
+    // React-Bits Installation section (Section 12)
+    const allDependencies = [
+      ...new Set([
+        ...(selectedBackground?.dependencies || []),
+        ...selectedComponents.flatMap(c => c.dependencies),
+        ...selectedAnimations.flatMap(a => a.dependencies),
+      ])
+    ];
+
+    const allCliCommands = [
+      selectedBackground?.cliCommand,
+      ...selectedComponents.map(c => c.cliCommand),
+      ...selectedAnimations.map(a => a.cliCommand),
+    ].filter(Boolean);
+
+    const installationSection = allCliCommands.length > 0
+      ? `
+
+## 12. React-Bits Installation
+
+**Step 1: Install Dependencies**
+\`\`\`bash
+npm install ${allDependencies.join(' ')}
+\`\`\`
+
+**Step 2: Install React-Bits Components**
+\`\`\`bash
+${allCliCommands.join('\n')}
+\`\`\`
+
+**Step 3: Import and Use**
+Refer to the component-specific usage examples above for implementation details.
+`
+      : '';
     
     return `Create a ${projectInfo.type.toLowerCase()} with the following specifications:
 
@@ -178,10 +283,11 @@ ${selectedSpecialLayouts.length > 0 ? `
 ## 6. Visual Elements
 ${visualElements.length > 0 ? visualElements.map(element => `- ${element}`).join('\n') : '- Standard visual elements'}
 
-## 7. UI/UX Animations
-${animations.length > 0 ? animations.map(anim => `- ${anim}: Smooth transitions and micro-interactions`).join('\n') : '- Subtle hover effects and transitions'}
+${backgroundSection}
+${componentsSection}
+${animationsSection}
 
-## 8. Functionality & Features
+## 10. Functionality & Features
 ${functionalityTier ? `
 **Tier:** ${functionalityTier.title}
 **Core Features:**
@@ -191,15 +297,16 @@ ${technicalFeatures.length > 0 ? `
 **Technical Requirements:**
 ${technicalFeatures.map(feature => `   - ${feature.title}: ${feature.description}`).join('\n')}` : ''}
 
-## 9. Technical Implementation
+## 11. Technical Implementation
 - **Framework:** React with TypeScript
 - **Styling:** Tailwind CSS with modern design patterns
 - **Responsive Design:** Mobile-first approach with breakpoints for tablet and desktop
 - **Accessibility:** WCAG 2.1 AA compliance
 - **Performance:** Optimized loading and smooth interactions
 - **SEO:** Semantic HTML structure and meta tags
+${installationSection}
 
-## 10. Design Requirements
+## 13. Design Requirements
 - **Modern Aesthetics:** Clean, professional design with attention to detail
 - **User Experience:** Intuitive navigation and clear information hierarchy
 - **Interactive Elements:** Smooth hover states, loading states, and feedback
@@ -216,7 +323,18 @@ Please implement this design with pixel-perfect attention to detail, ensuring al
     }
     
     const functionalityTier = selectedFunctionality.find(item => item.tier);
-    const animations = selectedAnimations.filter(Boolean);
+    
+    // Build react-bits summary
+    const reactBitsSummary = [];
+    if (selectedBackground) {
+      reactBitsSummary.push(`${selectedBackground.title} background`);
+    }
+    if (selectedComponents.length > 0) {
+      reactBitsSummary.push(`${selectedComponents.length} UI component${selectedComponents.length > 1 ? 's' : ''} (${selectedComponents.map(c => c.title).join(', ')})`);
+    }
+    if (selectedAnimations.length > 0) {
+      reactBitsSummary.push(`${selectedAnimations.length} animation${selectedAnimations.length > 1 ? 's' : ''} (${selectedAnimations.map(a => a.title).join(', ')})`);
+    }
     
     return `Create a ${projectInfo.type.toLowerCase()} called "${projectInfo.name}" for ${projectInfo.purpose.toLowerCase()} purposes. ${projectInfo.description}
 
@@ -224,13 +342,13 @@ Use a ${selectedLayout.title.toLowerCase()} layout with a ${selectedDesignStyle.
 
 For typography, use ${selectedTypography.fontFamily} with ${selectedTypography.headingWeight.toLowerCase()} headings and ${selectedTypography.bodyWeight.toLowerCase()} body text. Visual elements should include ${selectedVisuals.map(visual => `${visual.type} in ${visual.style} style`).join(', ')}.
 
-${animations.length > 0 ? `Include animations for ${animations.join(', ')}.` : ''}
+${reactBitsSummary.length > 0 ? `Include react-bits components: ${reactBitsSummary.join(', ')}.` : ''}
 
 Include ${functionalityTier ? functionalityTier.title.toLowerCase() : 'basic'} functionality features. Build using React, TypeScript, and Tailwind CSS with modern responsive design.`.trim();
   };
   
   // Project management
-  const saveProject = () => {
+  const saveProject = React.useCallback(() => {
     const projectData = {
       projectInfo,
       selectedLayout,
@@ -240,26 +358,73 @@ Include ${functionalityTier ? functionalityTier.title.toLowerCase() : 'basic'} f
       selectedTypography,
       selectedFunctionality,
       selectedVisuals,
+      selectedBackground,
+      backgroundSelection,
+      selectedComponents,
       selectedAnimations,
       currentStep,
       savedAt: new Date().toISOString()
     };
     
-    localStorage.setItem('lovabolt-project', JSON.stringify(projectData));
-  };
+    try {
+      localStorage.setItem('lovabolt-project', JSON.stringify(projectData));
+    } catch (error) {
+      console.error('Failed to save project to localStorage:', error);
+      if (error instanceof Error) {
+        console.error('Error details:', {
+          name: error.name,
+          message: error.message,
+          stack: error.stack
+        });
+      }
+      // Check if localStorage is available
+      if (typeof localStorage === 'undefined') {
+        console.error('localStorage is not available in this environment');
+      }
+    }
+  }, [projectInfo, selectedLayout, selectedSpecialLayouts, selectedDesignStyle, selectedColorTheme, selectedTypography, selectedFunctionality, selectedVisuals, selectedBackground, selectedComponents, selectedAnimations, currentStep]);
   
-  const loadProject = (projectData: any) => {
-    if (projectData.projectInfo) setProjectInfo(projectData.projectInfo);
-    if (projectData.selectedLayout) setSelectedLayout(projectData.selectedLayout);
-    if (projectData.selectedSpecialLayouts) setSelectedSpecialLayouts(projectData.selectedSpecialLayouts);
-    if (projectData.selectedDesignStyle) setSelectedDesignStyle(projectData.selectedDesignStyle);
-    if (projectData.selectedColorTheme) setSelectedColorTheme(projectData.selectedColorTheme);
-    if (projectData.selectedTypography) setSelectedTypography(projectData.selectedTypography);
-    if (projectData.selectedFunctionality) setSelectedFunctionality(projectData.selectedFunctionality);
-    if (projectData.selectedVisuals) setSelectedVisuals(projectData.selectedVisuals);
-    if (projectData.selectedAnimations) setSelectedAnimations(projectData.selectedAnimations);
-    if (projectData.currentStep) setCurrentStep(projectData.currentStep);
-  };
+  const loadProject = React.useCallback((projectData: Partial<{
+    projectInfo: ProjectInfo;
+    selectedLayout: LayoutOption;
+    selectedSpecialLayouts: LayoutOption[];
+    selectedDesignStyle: DesignStyle;
+    selectedColorTheme: ColorTheme;
+    selectedTypography: Typography;
+    selectedFunctionality: FunctionalityOption[];
+    selectedVisuals: VisualElement[];
+    selectedBackground: BackgroundOption;
+    backgroundSelection: BackgroundSelection;
+    selectedComponents: ComponentOption[];
+    selectedAnimations: AnimationOption[];
+    currentStep: string;
+  }>) => {
+    try {
+      if (projectData.projectInfo) setProjectInfo(projectData.projectInfo);
+      if (projectData.selectedLayout) setSelectedLayout(projectData.selectedLayout);
+      if (projectData.selectedSpecialLayouts) setSelectedSpecialLayouts(projectData.selectedSpecialLayouts);
+      if (projectData.selectedDesignStyle) setSelectedDesignStyle(projectData.selectedDesignStyle);
+      if (projectData.selectedColorTheme) setSelectedColorTheme(projectData.selectedColorTheme);
+      if (projectData.selectedTypography) setSelectedTypography(projectData.selectedTypography);
+      if (projectData.selectedFunctionality) setSelectedFunctionality(projectData.selectedFunctionality);
+      if (projectData.selectedVisuals) setSelectedVisuals(projectData.selectedVisuals);
+      if (projectData.selectedBackground) setSelectedBackground(projectData.selectedBackground);
+      if (projectData.backgroundSelection) setBackgroundSelection(projectData.backgroundSelection);
+      if (projectData.selectedComponents) setSelectedComponents(projectData.selectedComponents);
+      if (projectData.selectedAnimations) setSelectedAnimations(projectData.selectedAnimations);
+      if (projectData.currentStep) setCurrentStep(projectData.currentStep);
+    } catch (error) {
+      console.error('Error loading project data into state:', error);
+      if (error instanceof Error) {
+        console.error('Error details:', {
+          name: error.name,
+          message: error.message,
+          stack: error.stack
+        });
+      }
+      throw error; // Re-throw to be caught by the calling useEffect
+    }
+  }, []);
   
   const clearProject = () => {
     setProjectInfo({
@@ -277,47 +442,53 @@ Include ${functionalityTier ? functionalityTier.title.toLowerCase() : 'basic'} f
     setSelectedTypography(defaultTypography);
     setSelectedFunctionality([]);
     setSelectedVisuals([]);
+    setSelectedBackground(null);
+    setBackgroundSelection(null);
+    setSelectedComponents([]);
     setSelectedAnimations([]);
     setCurrentStep('project-setup');
     setPromptText('');
     localStorage.removeItem('lovabolt-project');
   };
   
-  // Auto-save functionality
+  // Auto-save functionality with debouncing (1 second delay)
+  // This prevents excessive localStorage writes during rapid state changes
+  // Performance optimization: Reduces I/O operations and improves responsiveness
   React.useEffect(() => {
-    const projectData = {
-      projectInfo,
-      selectedLayout,
-      selectedSpecialLayouts,
-      selectedDesignStyle,
-      selectedColorTheme,
-      selectedTypography,
-      selectedFunctionality,
-      selectedVisuals,
-      selectedAnimations,
-      currentStep,
-      savedAt: new Date().toISOString()
-    };
-    
     const timer = setTimeout(() => {
-      localStorage.setItem('lovabolt-project', JSON.stringify(projectData));
+      saveProject();
     }, 1000);
     
     return () => clearTimeout(timer);
-  }, [projectInfo, selectedLayout, selectedSpecialLayouts, selectedDesignStyle, selectedColorTheme, selectedTypography, selectedFunctionality, selectedVisuals, selectedAnimations, currentStep]);
+  }, [projectInfo, selectedLayout, selectedSpecialLayouts, selectedDesignStyle, selectedColorTheme, selectedTypography, selectedFunctionality, selectedVisuals, selectedBackground, backgroundSelection, selectedComponents, selectedAnimations, currentStep, saveProject]);
   
   // Load project on mount
   React.useEffect(() => {
-    const saved = localStorage.getItem('lovabolt-project');
-    if (saved) {
-      try {
+    try {
+      const saved = localStorage.getItem('lovabolt-project');
+      if (saved) {
         const projectData = JSON.parse(saved);
         loadProject(projectData);
-      } catch (error) {
-        console.error('Failed to load saved project:', error);
+        console.log('Project loaded successfully from localStorage');
+      }
+    } catch (error) {
+      console.error('Failed to load saved project from localStorage:', error);
+      if (error instanceof Error) {
+        console.error('Error details:', {
+          name: error.name,
+          message: error.message,
+          stack: error.stack
+        });
+      }
+      // Clear corrupted data
+      try {
+        localStorage.removeItem('lovabolt-project');
+        console.log('Corrupted project data cleared from localStorage');
+      } catch (e) {
+        console.error('Failed to clear corrupted project data:', e);
       }
     }
-  }, []);
+  }, [loadProject]);
   
   const contextValue: BoltBuilderContextType = {
     currentStep,
@@ -338,6 +509,12 @@ Include ${functionalityTier ? functionalityTier.title.toLowerCase() : 'basic'} f
     setSelectedFunctionality,
     selectedVisuals,
     setSelectedVisuals,
+    selectedBackground,
+    setSelectedBackground,
+    backgroundSelection,
+    setBackgroundSelection,
+    selectedComponents,
+    setSelectedComponents,
     selectedAnimations,
     setSelectedAnimations,
     progress,

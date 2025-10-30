@@ -369,18 +369,14 @@ export const visualTypes = [
       { id: 'nature', title: 'Nature', description: 'Natural landscapes and organic elements' },
       { id: 'lifestyle', title: 'Lifestyle', description: 'People and lifestyle photography' }
     ]
-  },
-  {
-    id: 'patterns',
-    title: 'Patterns',
-    description: 'Choose background patterns',
-    options: [
-      { id: 'geometric', title: 'Geometric', description: 'Regular shapes and mathematical patterns' },
-      { id: 'organic', title: 'Organic', description: 'Natural flowing patterns' },
-      { id: 'abstract', title: 'Abstract', description: 'Modern abstract patterns' },
-      { id: 'minimal', title: 'Minimal', description: 'Simple repeating patterns' }
-    ]
   }
+];
+
+export const backgroundPatterns = [
+  { id: 'geometric', title: 'Geometric', description: 'Regular shapes and mathematical patterns' },
+  { id: 'organic', title: 'Organic', description: 'Natural flowing patterns' },
+  { id: 'abstract', title: 'Abstract', description: 'Modern abstract patterns' },
+  { id: 'minimal', title: 'Minimal', description: 'Simple repeating patterns' }
 ];
 
 export const animationTypes = [
