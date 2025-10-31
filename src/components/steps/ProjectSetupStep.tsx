@@ -1,9 +1,25 @@
 import React, { useState } from 'react';
 import { Info } from 'lucide-react';
+import { z } from 'zod';
 import { useBoltBuilder } from '../../contexts/BoltBuilderContext';
 import { Button } from '../ui/button';
 import InfoModal from '../modals/InfoModal';
 import DescriptionHelpModal from '../modals/DescriptionHelpModal';
+
+// Zod validation schema
+const projectSetupSchema = z.object({
+  name: z.string()
+    .min(1, 'Project name is required')
+    .min(3, 'Project name must be at least 3 characters')
+    .max(100, 'Project name must be less than 100 characters'),
+  description: z.string()
+    .min(1, 'Project description is required')
+    .min(10, 'Description must be at least 10 characters')
+    .max(500, 'Description must be less than 500 characters'),
+  type: z.string(),
+  purpose: z.string(),
+  targetAudience: z.string().optional(),
+});
 
 const ProjectSetupStep: React.FC = () => {
   const { projectInfo, setProjectInfo, setCurrentStep } = useBoltBuilder();
@@ -15,19 +31,28 @@ const ProjectSetupStep: React.FC = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    const newErrors: Record<string, string> = {};
-    if (!projectInfo.name.trim()) newErrors.name = 'Please enter a project name';
-    if (!projectInfo.description.trim()) newErrors.description = 'Please enter a project description';
+    // Validate with Zod
+    const result = projectSetupSchema.safeParse(projectInfo);
 
-    setErrors(newErrors);
-
-    if (Object.keys(newErrors).length === 0) {
-      setShowSuccess(true);
-      setTimeout(() => {
-        setShowSuccess(false);
-        setCurrentStep('functionality');
-      }, 1500);
+    if (!result.success) {
+      // Extract errors from Zod validation
+      const newErrors: Record<string, string> = {};
+      result.error.errors.forEach((err) => {
+        if (err.path[0]) {
+          newErrors[err.path[0] as string] = err.message;
+        }
+      });
+      setErrors(newErrors);
+      return;
     }
+
+    // Clear errors and proceed
+    setErrors({});
+    setShowSuccess(true);
+    setTimeout(() => {
+      setShowSuccess(false);
+      setCurrentStep('layout');
+    }, 1500);
   };
 
   return (

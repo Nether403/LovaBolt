@@ -5,15 +5,21 @@ import { AnimationOption } from '../../types';
 import { Button } from '../ui/button';
 import { ReactBitsCard } from '../cards/ReactBitsCard';
 import { ReactBitsModal } from '../modals/ReactBitsModal';
+import { SearchFilter } from '../ui/SearchFilter';
 import ErrorBoundary from '../ErrorBoundary';
 import { StepErrorFallback } from '../StepErrorFallback';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 const ITEMS_PER_PAGE = 6;
 
+// Animation category tags
+const ANIMATION_TAGS = ['Cursor', 'Button', 'Text', 'Hover', 'Scroll', 'Transition'];
+
 const AnimationsStepContent: React.FC = () => {
   const { selectedAnimations, setSelectedAnimations, setCurrentStep } = useBoltBuilder();
   const [currentPage, setCurrentPage] = useState(1);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [modalState, setModalState] = useState<{
     isOpen: boolean;
     option: AnimationOption | null;
@@ -23,13 +29,52 @@ const AnimationsStepContent: React.FC = () => {
   });
   const [dataLoadError, setDataLoadError] = useState<boolean>(false);
 
+  // Filter animations based on search and tags
+  const filteredAnimations = useMemo(() => {
+    let filtered = reactBitsAnimations;
+    
+    // Apply search filter
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase();
+      filtered = filtered.filter((anim) =>
+        anim.title.toLowerCase().includes(query) ||
+        anim.description.toLowerCase().includes(query) ||
+        anim.id.toLowerCase().includes(query)
+      );
+    }
+    
+    // Apply tag filter
+    if (selectedTags.length > 0) {
+      filtered = filtered.filter((anim) =>
+        selectedTags.some(tag => 
+          anim.title.toLowerCase().includes(tag.toLowerCase()) ||
+          anim.description.toLowerCase().includes(tag.toLowerCase())
+        )
+      );
+    }
+    
+    return filtered;
+  }, [searchQuery, selectedTags]);
+
   // Pagination logic
-  const totalPages = Math.ceil(reactBitsAnimations.length / ITEMS_PER_PAGE);
+  const totalPages = Math.ceil(filteredAnimations.length / ITEMS_PER_PAGE);
   const paginatedAnimations = useMemo(() => {
     const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
     const endIndex = startIndex + ITEMS_PER_PAGE;
-    return reactBitsAnimations.slice(startIndex, endIndex);
-  }, [currentPage]);
+    return filteredAnimations.slice(startIndex, endIndex);
+  }, [currentPage, filteredAnimations]);
+
+  // Reset to page 1 when filters change
+  React.useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery, selectedTags]);
+
+  // Handle tag toggle
+  const handleTagToggle = React.useCallback((tag: string) => {
+    setSelectedTags((prev) =>
+      prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag]
+    );
+  }, []);
 
   // Memoize toggle handler to prevent unnecessary re-renders of child components
   const handleToggle = React.useCallback((option: AnimationOption) => {
@@ -105,6 +150,18 @@ const AnimationsStepContent: React.FC = () => {
         </p>
       </div>
 
+      {/* Search and Filter */}
+      <div className="animate-slide-up">
+        <SearchFilter
+          value={searchQuery}
+          onChange={setSearchQuery}
+          placeholder="Search animations (e.g., blob, magnetic, gooey...)"
+          tags={ANIMATION_TAGS}
+          selectedTags={selectedTags}
+          onTagToggle={handleTagToggle}
+        />
+      </div>
+
       {/* Info banner */}
       <div className="relative overflow-hidden rounded-xl animate-slide-up">
         <div className="absolute inset-0 glass-card" />
@@ -116,7 +173,7 @@ const AnimationsStepContent: React.FC = () => {
           </div>
           <div className="flex-1">
             <p className="text-sm text-gray-300">
-              Live animated previews • {reactBitsAnimations.length} animations available • Page {currentPage} of {totalPages}
+              {searchQuery || selectedTags.length > 0 ? `${filteredAnimations.length} results found` : `${reactBitsAnimations.length} animations available`} • Page {currentPage} of {totalPages}
             </p>
           </div>
         </div>

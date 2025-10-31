@@ -5,15 +5,21 @@ import { ComponentOption } from '../../types';
 import { Button } from '../ui/button';
 import { ReactBitsCard } from '../cards/ReactBitsCard';
 import { ReactBitsModal } from '../modals/ReactBitsModal';
+import { SearchFilter } from '../ui/SearchFilter';
 import ErrorBoundary from '../ErrorBoundary';
 import { StepErrorFallback } from '../StepErrorFallback';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 const ITEMS_PER_PAGE = 6;
 
+// Extract unique tags from components
+const COMPONENT_TAGS = ['Navigation', 'Input', 'Display', 'Feedback', 'Layout', 'Interactive'];
+
 const ComponentsStepContent: React.FC = () => {
   const { selectedComponents, setSelectedComponents, setCurrentStep } = useBoltBuilder();
   const [currentPage, setCurrentPage] = useState(1);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [modalState, setModalState] = useState<{
     isOpen: boolean;
     option: ComponentOption | null;
@@ -23,13 +29,52 @@ const ComponentsStepContent: React.FC = () => {
   });
   const [dataLoadError, setDataLoadError] = useState<boolean>(false);
 
+  // Filter components based on search and tags
+  const filteredComponents = useMemo(() => {
+    let filtered = reactBitsComponents;
+    
+    // Apply search filter
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase();
+      filtered = filtered.filter((comp) =>
+        comp.title.toLowerCase().includes(query) ||
+        comp.description.toLowerCase().includes(query) ||
+        comp.id.toLowerCase().includes(query)
+      );
+    }
+    
+    // Apply tag filter
+    if (selectedTags.length > 0) {
+      filtered = filtered.filter((comp) =>
+        selectedTags.some(tag => 
+          comp.title.toLowerCase().includes(tag.toLowerCase()) ||
+          comp.description.toLowerCase().includes(tag.toLowerCase())
+        )
+      );
+    }
+    
+    return filtered;
+  }, [searchQuery, selectedTags]);
+
   // Pagination logic
-  const totalPages = Math.ceil(reactBitsComponents.length / ITEMS_PER_PAGE);
+  const totalPages = Math.ceil(filteredComponents.length / ITEMS_PER_PAGE);
   const paginatedComponents = useMemo(() => {
     const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
     const endIndex = startIndex + ITEMS_PER_PAGE;
-    return reactBitsComponents.slice(startIndex, endIndex);
-  }, [currentPage]);
+    return filteredComponents.slice(startIndex, endIndex);
+  }, [currentPage, filteredComponents]);
+
+  // Reset to page 1 when filters change
+  React.useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery, selectedTags]);
+
+  // Handle tag toggle
+  const handleTagToggle = React.useCallback((tag: string) => {
+    setSelectedTags((prev) =>
+      prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag]
+    );
+  }, []);
 
   // Memoize toggle handler to prevent unnecessary re-renders of child components
   const handleToggle = React.useCallback((option: ComponentOption) => {
@@ -109,6 +154,18 @@ const ComponentsStepContent: React.FC = () => {
         </p>
       </div>
 
+      {/* Search and Filter */}
+      <div className="animate-slide-up">
+        <SearchFilter
+          value={searchQuery}
+          onChange={setSearchQuery}
+          placeholder="Search components (e.g., carousel, dock, accordion...)"
+          tags={COMPONENT_TAGS}
+          selectedTags={selectedTags}
+          onTagToggle={handleTagToggle}
+        />
+      </div>
+
       {/* Info banner */}
       <div className="relative overflow-hidden rounded-xl animate-slide-up">
         <div className="absolute inset-0 glass-card" />
@@ -120,7 +177,7 @@ const ComponentsStepContent: React.FC = () => {
           </div>
           <div className="flex-1">
             <p className="text-sm text-gray-300">
-              Live animated previews • {reactBitsComponents.length} components available • Page {currentPage} of {totalPages}
+              {searchQuery || selectedTags.length > 0 ? `${filteredComponents.length} results found` : `${reactBitsComponents.length} components available`} • Page {currentPage} of {totalPages}
             </p>
           </div>
         </div>
