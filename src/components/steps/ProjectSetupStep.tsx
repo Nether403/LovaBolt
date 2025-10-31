@@ -1,18 +1,157 @@
 import React, { useState } from 'react';
-import { Info } from 'lucide-react';
+import { Info, Sparkles, CheckCircle } from 'lucide-react';
 import { useBoltBuilder } from '../../contexts/BoltBuilderContext';
 import { Button } from '../ui/button';
 import InfoModal from '../modals/InfoModal';
 import DescriptionHelpModal from '../modals/DescriptionHelpModal';
 import { projectInfoSchema } from '../../types/validation';
 import { z } from 'zod';
+import { getSmartDefaults, applySmartDefaults } from '../../utils/smartDefaults';
+import {
+  layoutOptions,
+  designStyles,
+  colorThemes,
+  functionalityOptions,
+} from '../../data/wizardData';
+import { backgroundOptions, componentOptions, animationOptions } from '../../data/reactBitsData';
+import { NLPInput } from '../ai/NLPInput';
+import { applyNLPResults, NLPParseResult } from '../../utils/nlpParser';
 
 const ProjectSetupStep: React.FC = () => {
-  const { projectInfo, setProjectInfo, setCurrentStep } = useBoltBuilder();
+  const {
+    projectInfo,
+    setProjectInfo,
+    setCurrentStep,
+    selectedLayout,
+    setSelectedLayout,
+    selectedDesignStyle,
+    setSelectedDesignStyle,
+    selectedColorTheme,
+    setSelectedColorTheme,
+    selectedTypography,
+    setSelectedTypography,
+    selectedFunctionality,
+    setSelectedFunctionality,
+    selectedBackground,
+    setSelectedBackground,
+    selectedComponents,
+    setSelectedComponents,
+    selectedAnimations,
+    setSelectedAnimations,
+  } = useBoltBuilder();
   const [showInfoModal, setShowInfoModal] = useState(false);
   const [showDescriptionHelp, setShowDescriptionHelp] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
   const [validationErrors, setValidationErrors] = useState<Record<string, string[]>>({});
+  const [smartDefaultsApplied, setSmartDefaultsApplied] = useState(false);
+  const [showSmartDefaultsNotification, setShowSmartDefaultsNotification] = useState(false);
+  const [showNLPSection, setShowNLPSection] = useState(false);
+
+  const handleApplyNLPDetections = (parseResult: NLPParseResult) => {
+    const updates = applyNLPResults(
+      parseResult,
+      projectInfo,
+      selectedDesignStyle || undefined,
+      selectedColorTheme || undefined
+    );
+
+    // Apply detected project info
+    if (updates.projectInfo) {
+      setProjectInfo({ ...projectInfo, ...updates.projectInfo });
+    }
+
+    // Apply detected design style
+    if (updates.designStyle) {
+      setSelectedDesignStyle(updates.designStyle);
+    }
+
+    // Apply detected color theme
+    if (updates.colorTheme) {
+      setSelectedColorTheme(updates.colorTheme);
+    }
+
+    // Show notification
+    setShowSmartDefaultsNotification(true);
+    sessionStorage.setItem(
+      'smartDefaultsReasoning',
+      'We detected your preferences from your description and applied them automatically.'
+    );
+
+    // Hide notification after 5 seconds
+    setTimeout(() => {
+      setShowSmartDefaultsNotification(false);
+    }, 5000);
+  };
+
+  const handleApplySmartDefaults = () => {
+    const currentState = {
+      selectedLayout,
+      selectedDesignStyle,
+      selectedColorTheme,
+      selectedTypography,
+      selectedFunctionality,
+      selectedBackground,
+      selectedComponents,
+      selectedAnimations,
+    };
+
+    const defaults = applySmartDefaults(projectInfo.type, projectInfo.purpose, currentState);
+    const { reasoning } = getSmartDefaults(projectInfo.type, projectInfo.purpose);
+
+    // Apply defaults to context
+    if (defaults.layout) {
+      const layout = layoutOptions.find((l) => l.id === defaults.layout);
+      if (layout) setSelectedLayout(layout);
+    }
+
+    if (defaults.designStyle) {
+      const style = designStyles.find((s) => s.id === defaults.designStyle);
+      if (style) setSelectedDesignStyle(style);
+    }
+
+    if (defaults.colorTheme) {
+      const theme = colorThemes.find((t) => t.id === defaults.colorTheme);
+      if (theme) setSelectedColorTheme(theme);
+    }
+
+    if (defaults.typography) {
+      setSelectedTypography({ ...selectedTypography, ...defaults.typography });
+    }
+
+    if (defaults.functionality) {
+      const functionality = functionalityOptions.filter((f) =>
+        defaults.functionality?.includes(f.id)
+      );
+      setSelectedFunctionality(functionality);
+    }
+
+    if (defaults.background) {
+      const background = backgroundOptions.find((b) => b.id === defaults.background);
+      if (background) setSelectedBackground(background);
+    }
+
+    if (defaults.components) {
+      const components = componentOptions.filter((c) => defaults.components?.includes(c.id));
+      setSelectedComponents(components);
+    }
+
+    if (defaults.animations) {
+      const animations = animationOptions.filter((a) => defaults.animations?.includes(a.id));
+      setSelectedAnimations(animations);
+    }
+
+    // Show notification
+    setSmartDefaultsApplied(true);
+    setShowSmartDefaultsNotification(true);
+
+    // Store reasoning for display
+    sessionStorage.setItem('smartDefaultsReasoning', reasoning);
+
+    // Hide notification after 5 seconds
+    setTimeout(() => {
+      setShowSmartDefaultsNotification(false);
+    }, 5000);
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -64,6 +203,24 @@ const ProjectSetupStep: React.FC = () => {
       {showSuccess && (
         <div className="bg-white/10 border-l-4 border-white/40 text-white p-4 mb-6 rounded animate-fade-in backdrop-blur-sm">
           <p>Project saved successfully!</p>
+        </div>
+      )}
+
+      {/* Smart Defaults Notification */}
+      {showSmartDefaultsNotification && (
+        <div className="glass-card border-l-4 border-teal-500 text-white p-4 mb-6 rounded-lg animate-fade-in backdrop-blur-sm">
+          <div className="flex items-start gap-3">
+            <CheckCircle className="w-5 h-5 text-teal-400 flex-shrink-0 mt-0.5" />
+            <div className="flex-1">
+              <p className="font-semibold text-teal-400 mb-1">Smart Defaults Applied!</p>
+              <p className="text-sm text-gray-300">
+                {sessionStorage.getItem('smartDefaultsReasoning')}
+              </p>
+              <p className="text-xs text-gray-400 mt-2">
+                You can override any of these selections as you progress through the wizard.
+              </p>
+            </div>
+          </div>
         </div>
       )}
 
@@ -145,6 +302,31 @@ const ProjectSetupStep: React.FC = () => {
           </div>
         </div>
 
+        {/* NLP Input Section */}
+        <div className="border-t border-white/10 pt-6">
+          <button
+            type="button"
+            onClick={() => setShowNLPSection(!showNLPSection)}
+            className="flex items-center gap-2 text-sm text-teal-400 hover:text-teal-300 transition-colors mb-4"
+          >
+            <Sparkles className="w-4 h-4" />
+            <span className="font-medium">
+              {showNLPSection ? 'Hide' : 'Try'} AI-Powered Quick Setup
+            </span>
+          </button>
+
+          {showNLPSection && (
+            <div className="animate-fade-in">
+              <NLPInput
+                onApplyDetections={handleApplyNLPDetections}
+                currentProjectInfo={projectInfo}
+                currentDesignStyle={selectedDesignStyle || undefined}
+                currentColorTheme={selectedColorTheme || undefined}
+              />
+            </div>
+          )}
+        </div>
+
         {/* Project Type */}
         <div>
           <label htmlFor="project-type" className="block text-sm font-medium text-gray-300 mb-1">
@@ -154,7 +336,10 @@ const ProjectSetupStep: React.FC = () => {
             id="project-type"
             value={projectInfo.type}
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            onChange={(e) => setProjectInfo({ ...projectInfo, type: e.target.value as any })}
+            onChange={(e) => {
+              setProjectInfo({ ...projectInfo, type: e.target.value as any });
+              setSmartDefaultsApplied(false); // Reset when type changes
+            }}
             className={`
               w-full px-4 py-3 rounded-lg bg-white/5 border text-white
               focus:ring-2 focus:ring-blue-500/50 focus:border-transparent
@@ -177,6 +362,34 @@ const ProjectSetupStep: React.FC = () => {
                   {error}
                 </p>
               ))}
+            </div>
+          )}
+
+          {/* Smart Defaults Button */}
+          {projectInfo.type && projectInfo.purpose && !smartDefaultsApplied && (
+            <div className="mt-3">
+              <button
+                type="button"
+                onClick={handleApplySmartDefaults}
+                className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-lg
+                         bg-gradient-to-r from-teal-600 to-blue-600 hover:from-teal-700 hover:to-blue-700
+                         text-white font-medium transition-all duration-200
+                         hover:scale-[1.02] active:scale-[0.98]
+                         shadow-lg hover:shadow-xl"
+              >
+                <Sparkles className="w-5 h-5" />
+                <span>Use Smart Defaults</span>
+              </button>
+              <p className="text-xs text-gray-400 mt-2 text-center">
+                Let AI suggest optimal settings for your {projectInfo.type.toLowerCase()}
+              </p>
+            </div>
+          )}
+
+          {smartDefaultsApplied && (
+            <div className="mt-3 flex items-center gap-2 text-sm text-teal-400">
+              <CheckCircle className="w-4 h-4" />
+              <span>Smart defaults applied</span>
             </div>
           )}
         </div>

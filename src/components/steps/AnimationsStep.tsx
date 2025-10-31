@@ -10,6 +10,8 @@ import { useSearchFilter } from '../../hooks/useSearchFilter';
 import ErrorBoundary from '../ErrorBoundary';
 import { StepErrorFallback } from '../StepErrorFallback';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { SmartSuggestionPanel } from '../ai/SmartSuggestionPanel';
+import { useSmartSuggestions } from '../../hooks/useSmartSuggestions';
 
 const ITEMS_PER_PAGE = 6;
 
@@ -19,7 +21,7 @@ const ANIMATION_TAGS = Array.from(
 ).sort();
 
 const AnimationsStepContent: React.FC = () => {
-  const { selectedAnimations, setSelectedAnimations, setCurrentStep } = useBoltBuilder();
+  const { selectedAnimations, setSelectedAnimations, setCurrentStep, selectedDesignStyle } = useBoltBuilder();
   const [currentPage, setCurrentPage] = useState(1);
   const [modalState, setModalState] = useState<{
     isOpen: boolean;
@@ -29,6 +31,13 @@ const AnimationsStepContent: React.FC = () => {
     option: null,
   });
   const [dataLoadError, setDataLoadError] = useState<boolean>(false);
+
+  // Get AI suggestions
+  const suggestions = useSmartSuggestions({
+    currentStep: 'animations',
+    selections: { selectedDesignStyle },
+    enabled: true,
+  });
 
   // Use search filter hook
   const {
@@ -140,6 +149,18 @@ const AnimationsStepContent: React.FC = () => {
           resultCount={resultCount}
         />
       </div>
+
+      {/* AI Suggestions */}
+      {suggestions.length > 0 && (
+        <div className="animate-slide-up">
+          <SmartSuggestionPanel
+            suggestions={suggestions}
+            onApplySuggestion={(suggestion, item) => {
+              handleToggle(item);
+            }}
+          />
+        </div>
+      )}
 
       {/* Info banner */}
       <div className="relative overflow-hidden rounded-xl animate-slide-up">

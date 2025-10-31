@@ -3,11 +3,20 @@ import { useBoltBuilder } from '../../contexts/BoltBuilderContext';
 import { colorThemes } from '../../data/wizardData';
 import { Button } from '../ui/button';
 import ColorThemeCard from '../cards/ColorThemeCard';
+import { SmartSuggestionPanel } from '../ai/SmartSuggestionPanel';
+import { useSmartSuggestions } from '../../hooks/useSmartSuggestions';
 
 const ColorThemeStep: React.FC = () => {
-  const { selectedColorTheme, setSelectedColorTheme, setCurrentStep } = useBoltBuilder();
+  const { selectedColorTheme, setSelectedColorTheme, setCurrentStep, selectedDesignStyle } = useBoltBuilder();
   const [customColors, setCustomColors] = useState(['#3B82F6', '#1E40AF', '#F59E0B']);
   const [darkMode, setDarkMode] = useState<'light' | 'dark' | 'system'>('system');
+
+  // Get AI suggestions
+  const suggestions = useSmartSuggestions({
+    currentStep: 'color-theme',
+    selections: { selectedDesignStyle },
+    enabled: true,
+  });
 
   const handleThemeSelect = (themeId: string) => {
     const theme = colorThemes.find(t => t.id === themeId);
@@ -119,6 +128,16 @@ const ColorThemeStep: React.FC = () => {
           </button>
         </div>
       </div>
+
+      {/* AI Suggestions */}
+      {suggestions.length > 0 && (
+        <SmartSuggestionPanel
+          suggestions={suggestions}
+          onApplySuggestion={(suggestion, item) => {
+            handleThemeSelect(item.id);
+          }}
+        />
+      )}
 
       {/* Color Themes Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

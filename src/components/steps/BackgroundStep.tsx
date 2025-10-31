@@ -11,6 +11,8 @@ import { useSearchFilter } from '../../hooks/useSearchFilter';
 import ErrorBoundary from '../ErrorBoundary';
 import { StepErrorFallback } from '../StepErrorFallback';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { SmartSuggestionPanel } from '../ai/SmartSuggestionPanel';
+import { useSmartSuggestions } from '../../hooks/useSmartSuggestions';
 
 const ITEMS_PER_PAGE = 6;
 
@@ -20,7 +22,7 @@ const BACKGROUND_TAGS = Array.from(
 ).sort();
 
 const BackgroundStepContent: React.FC = () => {
-  const { backgroundSelection, setBackgroundSelection, setCurrentStep } = useBoltBuilder();
+  const { backgroundSelection, setBackgroundSelection, setCurrentStep, selectedColorTheme } = useBoltBuilder();
   const [backgroundType, setBackgroundType] = useState<
     'solid' | 'gradient' | 'pattern' | 'react-bits'
   >(backgroundSelection?.type || 'solid');
@@ -39,6 +41,13 @@ const BackgroundStepContent: React.FC = () => {
   }>({
     isOpen: false,
     option: null,
+  });
+
+  // Get AI suggestions
+  const suggestions = useSmartSuggestions({
+    currentStep: 'background',
+    selections: { selectedColorTheme },
+    enabled: true,
   });
 
   // Use search filter hook
@@ -358,6 +367,16 @@ const BackgroundStepContent: React.FC = () => {
             onTagToggle={toggleTag}
             resultCount={resultCount}
           />
+
+          {/* AI Suggestions */}
+          {suggestions.length > 0 && (
+            <SmartSuggestionPanel
+              suggestions={suggestions}
+              onApplySuggestion={(suggestion, item) => {
+                handleReactBitsSelect(item);
+              }}
+            />
+          )}
 
           {/* Info banner */}
           <div className="relative overflow-hidden rounded-xl">

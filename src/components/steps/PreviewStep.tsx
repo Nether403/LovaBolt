@@ -1,7 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useBoltBuilder } from '../../contexts/BoltBuilderContext';
 import { Button } from '../ui/button';
 import PromptModal from '../modals/PromptModal';
+import { PromptQualityScore } from '../ai/PromptQualityScore';
+import { analyzePrompt, type PromptAnalysisResult } from '../../utils/promptAnalyzer';
 
 const PreviewStep: React.FC = () => {
   const {
@@ -11,6 +13,8 @@ const PreviewStep: React.FC = () => {
     selectedColorTheme,
     selectedTypography,
     selectedFunctionality,
+    selectedComponents,
+    selectedAnimations,
     generatePrompt,
     generateBasicPrompt,
     setCurrentStep,
@@ -21,11 +25,55 @@ const PreviewStep: React.FC = () => {
   } = useBoltBuilder();
 
   const [isPromptModalOpen, setIsPromptModalOpen] = useState(false);
+  const [promptAnalysis, setPromptAnalysis] = useState<PromptAnalysisResult | null>(null);
 
   const generatePromptType = (type: 'basic' | 'detailed') => {
     const prompt = type === 'basic' ? generateBasicPrompt() : generatePrompt();
     setPromptText(prompt);
     setPromptType(type);
+    
+    // Analyze the generated prompt
+    const analysis = analyzePrompt({
+      prompt,
+      projectInfo,
+      selectedDesignStyle: selectedDesignStyle || undefined,
+      selectedColorTheme: selectedColorTheme || undefined,
+      selectedComponents,
+      selectedAnimations,
+    });
+    setPromptAnalysis(analysis);
+  };
+
+  // Analyze prompt when it changes
+  useEffect(() => {
+    if (promptText) {
+      const analysis = analyzePrompt({
+        prompt: promptText,
+        projectInfo,
+        selectedDesignStyle: selectedDesignStyle || undefined,
+        selectedColorTheme: selectedColorTheme || undefined,
+        selectedComponents,
+        selectedAnimations,
+      });
+      setPromptAnalysis(analysis);
+    }
+  }, [promptText, projectInfo, selectedDesignStyle, selectedColorTheme, selectedComponents, selectedAnimations]);
+
+  const handleApplyFixes = () => {
+    if (promptAnalysis?.optimizedPrompt) {
+      setPromptText(promptAnalysis.optimizedPrompt);
+      
+      // Re-analyze the optimized prompt
+      const newAnalysis = analyzePrompt({
+        prompt: promptAnalysis.optimizedPrompt,
+        projectInfo,
+        selectedDesignStyle: selectedDesignStyle || undefined,
+        selectedColorTheme: selectedColorTheme || undefined,
+        selectedComponents,
+        selectedAnimations,
+      });
+      setPromptAnalysis(newAnalysis);
+    }
   };
 
   return (
@@ -173,6 +221,16 @@ const PreviewStep: React.FC = () => {
           </Button>
         </div>
       </div>
+
+      {/* Prompt Quality Analysis */}
+      {promptAnalysis && (
+        <div className="mt-8">
+          <PromptQualityScore
+            analysis={promptAnalysis}
+            onApplyFixes={handleApplyFixes}
+          />
+        </div>
+      )}
 
       {/* Generate Prompt */}
       <div className="flex justify-center pt-8">
