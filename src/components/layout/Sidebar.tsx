@@ -13,6 +13,8 @@ import {
   Redo2,
 } from 'lucide-react';
 import { useBoltBuilder } from '../../contexts/BoltBuilderContext';
+import { CompatibilityIndicator } from '../ai/CompatibilityIndicator';
+import { useCompatibilityCheck } from '../../hooks/useCompatibilityCheck';
 
 interface SidebarProps {
   isOpen: boolean;
@@ -21,10 +23,16 @@ interface SidebarProps {
 
 const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
   const { currentStep, setCurrentStep, canUndo, canRedo, undo, redo } = useBoltBuilder();
+  const compatibility = useCompatibilityCheck();
 
   const handleStepChange = (step: string) => {
     setCurrentStep(step);
     if (isOpen) onClose();
+  };
+
+  const handleAutoFix = () => {
+    // TODO: Implement auto-fix logic based on issue type
+    // This will be implemented in a future task
   };
 
   const navigationItems = [
@@ -159,6 +167,11 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
             ))}
           </ul>
         </nav>
+
+        {/* Compatibility Indicator */}
+        <div className="p-4 border-t border-white/10">
+          <CompatibilityIndicator compatibility={compatibility} onAutoFix={handleAutoFix} />
+        </div>
       </aside>
     </>
   );
