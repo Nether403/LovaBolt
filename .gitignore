@@ -27,3 +27,6 @@ dist-ssr
 # Windows artifacts
 desktop.ini
 Thumbs.db
+
+# React-bits resources folder (local development only)
+react-bits/
