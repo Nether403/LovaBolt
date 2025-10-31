@@ -11,16 +11,16 @@ interface State {
 }
 
 class ErrorBoundary extends Component<Props, State> {
-  public state: State = {
+  public override state: State = {
     hasError: false,
-    error: null
+    error: null,
   };
 
   public static getDerivedStateFromError(error: Error): State {
     return { hasError: true, error };
   }
 
-  public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
+  public override componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     console.error('ErrorBoundary caught an error:', error, errorInfo);
   }
 
@@ -29,7 +29,7 @@ class ErrorBoundary extends Component<Props, State> {
     window.location.href = '/';
   };
 
-  public render() {
+  public override render() {
     if (this.state.hasError) {
       if (this.props.fallback) {
         return this.props.fallback;
@@ -53,15 +53,13 @@ class ErrorBoundary extends Component<Props, State> {
                 />
               </svg>
             </div>
-            
-            <h1 className="text-2xl font-bold text-white mb-2">
-              Oops! Something went wrong
-            </h1>
-            
+
+            <h1 className="text-2xl font-bold text-white mb-2">Oops! Something went wrong</h1>
+
             <p className="text-gray-300 mb-6">
               We encountered an unexpected error. Don't worry, your progress has been saved.
             </p>
-            
+
             {this.state.error && (
               <details className="mb-6 text-left">
                 <summary className="text-sm text-gray-400 cursor-pointer hover:text-gray-300 mb-2">
@@ -72,7 +70,7 @@ class ErrorBoundary extends Component<Props, State> {
                 </pre>
               </details>
             )}
-            
+
             <button
               onClick={this.handleReset}
               className="px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 rounded-lg text-white font-semibold transition-all duration-300 hover:scale-105"

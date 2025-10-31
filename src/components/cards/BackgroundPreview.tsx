@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useEffect, useRef, useState, Suspense, lazy } from 'react';
 import { ReactBitsComponent } from '../../types';
 
@@ -58,65 +60,143 @@ const safeLoad = (importFn: () => Promise<any>, name: string) => {
 // @ts-ignore - React-bits components are JSX without type definitions
 const backgroundComponents: Record<string, React.LazyExoticComponent<any>> = {
   // @ts-ignore
-  aurora: safeLoad(() => import('../../../react-bits/src/content/Backgrounds/Aurora/Aurora'), 'Aurora'),
+  aurora: safeLoad(
+    () => import('../../../react-bits/src/content/Backgrounds/Aurora/Aurora'),
+    'Aurora'
+  ),
   // @ts-ignore
-  balatro: safeLoad(() => import('../../../react-bits/src/content/Backgrounds/Balatro/Balatro'), 'Balatro'),
+  balatro: safeLoad(
+    () => import('../../../react-bits/src/content/Backgrounds/Balatro/Balatro'),
+    'Balatro'
+  ),
   // @ts-ignore
-  ballpit: safeLoad(() => import('../../../react-bits/src/content/Backgrounds/Ballpit/Ballpit'), 'Ballpit'),
+  ballpit: safeLoad(
+    () => import('../../../react-bits/src/content/Backgrounds/Ballpit/Ballpit'),
+    'Ballpit'
+  ),
   // @ts-ignore
   beams: safeLoad(() => import('../../../react-bits/src/content/Backgrounds/Beams/Beams'), 'Beams'),
   // @ts-ignore
-  'color-bends': safeLoad(() => import('../../../react-bits/src/content/Backgrounds/ColorBends/ColorBends'), 'ColorBends'),
+  'color-bends': safeLoad(
+    () => import('../../../react-bits/src/content/Backgrounds/ColorBends/ColorBends'),
+    'ColorBends'
+  ),
   // @ts-ignore
-  'dark-veil': safeLoad(() => import('../../../react-bits/src/content/Backgrounds/DarkVeil/DarkVeil'), 'DarkVeil'),
+  'dark-veil': safeLoad(
+    () => import('../../../react-bits/src/content/Backgrounds/DarkVeil/DarkVeil'),
+    'DarkVeil'
+  ),
   // @ts-ignore
-  dither: safeLoad(() => import('../../../react-bits/src/content/Backgrounds/Dither/Dither'), 'Dither'),
+  dither: safeLoad(
+    () => import('../../../react-bits/src/content/Backgrounds/Dither/Dither'),
+    'Dither'
+  ),
   // @ts-ignore
-  'dot-grid': safeLoad(() => import('../../../react-bits/src/content/Backgrounds/DotGrid/DotGrid'), 'DotGrid'),
+  'dot-grid': safeLoad(
+    () => import('../../../react-bits/src/content/Backgrounds/DotGrid/DotGrid'),
+    'DotGrid'
+  ),
   // @ts-ignore
-  'faulty-terminal': safeLoad(() => import('../../../react-bits/src/content/Backgrounds/FaultyTerminal/FaultyTerminal'), 'FaultyTerminal'),
+  'faulty-terminal': safeLoad(
+    () => import('../../../react-bits/src/content/Backgrounds/FaultyTerminal/FaultyTerminal'),
+    'FaultyTerminal'
+  ),
   // @ts-ignore
-  galaxy: safeLoad(() => import('../../../react-bits/src/content/Backgrounds/Galaxy/Galaxy'), 'Galaxy'),
+  galaxy: safeLoad(
+    () => import('../../../react-bits/src/content/Backgrounds/Galaxy/Galaxy'),
+    'Galaxy'
+  ),
   // @ts-ignore
-  'gradient-blinds': safeLoad(() => import('../../../react-bits/src/content/Backgrounds/GradientBlinds/GradientBlinds'), 'GradientBlinds'),
+  'gradient-blinds': safeLoad(
+    () => import('../../../react-bits/src/content/Backgrounds/GradientBlinds/GradientBlinds'),
+    'GradientBlinds'
+  ),
   // @ts-ignore
-  'grid-distortion': safeLoad(() => import('../../../react-bits/src/content/Backgrounds/GridDistortion/GridDistortion'), 'GridDistortion'),
+  'grid-distortion': safeLoad(
+    () => import('../../../react-bits/src/content/Backgrounds/GridDistortion/GridDistortion'),
+    'GridDistortion'
+  ),
   // @ts-ignore
-  'grid-motion': safeLoad(() => import('../../../react-bits/src/content/Backgrounds/GridMotion/GridMotion'), 'GridMotion'),
+  'grid-motion': safeLoad(
+    () => import('../../../react-bits/src/content/Backgrounds/GridMotion/GridMotion'),
+    'GridMotion'
+  ),
   // @ts-ignore
-  hyperspeed: safeLoad(() => import('../../../react-bits/src/content/Backgrounds/Hyperspeed/Hyperspeed'), 'Hyperspeed'),
+  hyperspeed: safeLoad(
+    () => import('../../../react-bits/src/content/Backgrounds/Hyperspeed/Hyperspeed'),
+    'Hyperspeed'
+  ),
   // @ts-ignore
-  iridescence: safeLoad(() => import('../../../react-bits/src/content/Backgrounds/Iridescence/Iridescence'), 'Iridescence'),
+  iridescence: safeLoad(
+    () => import('../../../react-bits/src/content/Backgrounds/Iridescence/Iridescence'),
+    'Iridescence'
+  ),
   // @ts-ignore
-  'letter-glitch': safeLoad(() => import('../../../react-bits/src/content/Backgrounds/LetterGlitch/LetterGlitch'), 'LetterGlitch'),
+  'letter-glitch': safeLoad(
+    () => import('../../../react-bits/src/content/Backgrounds/LetterGlitch/LetterGlitch'),
+    'LetterGlitch'
+  ),
   // @ts-ignore
-  lightning: safeLoad(() => import('../../../react-bits/src/content/Backgrounds/Lightning/Lightning'), 'Lightning'),
+  lightning: safeLoad(
+    () => import('../../../react-bits/src/content/Backgrounds/Lightning/Lightning'),
+    'Lightning'
+  ),
   // @ts-ignore
-  'light-rays': safeLoad(() => import('../../../react-bits/src/content/Backgrounds/LightRays/LightRays'), 'LightRays'),
+  'light-rays': safeLoad(
+    () => import('../../../react-bits/src/content/Backgrounds/LightRays/LightRays'),
+    'LightRays'
+  ),
   // @ts-ignore
-  'liquid-chrome': safeLoad(() => import('../../../react-bits/src/content/Backgrounds/LiquidChrome/LiquidChrome'), 'LiquidChrome'),
+  'liquid-chrome': safeLoad(
+    () => import('../../../react-bits/src/content/Backgrounds/LiquidChrome/LiquidChrome'),
+    'LiquidChrome'
+  ),
   // @ts-ignore
-  'liquid-ether': safeLoad(() => import('../../../react-bits/src/content/Backgrounds/LiquidEther/LiquidEther'), 'LiquidEther'),
+  'liquid-ether': safeLoad(
+    () => import('../../../react-bits/src/content/Backgrounds/LiquidEther/LiquidEther'),
+    'LiquidEther'
+  ),
   // @ts-ignore
   orb: safeLoad(() => import('../../../react-bits/src/content/Backgrounds/Orb/Orb'), 'Orb'),
   // @ts-ignore
-  particles: safeLoad(() => import('../../../react-bits/src/content/Backgrounds/Particles/Particles'), 'Particles'),
+  particles: safeLoad(
+    () => import('../../../react-bits/src/content/Backgrounds/Particles/Particles'),
+    'Particles'
+  ),
   // @ts-ignore
-  'pixel-blast': safeLoad(() => import('../../../react-bits/src/content/Backgrounds/PixelBlast/PixelBlast'), 'PixelBlast'),
+  'pixel-blast': safeLoad(
+    () => import('../../../react-bits/src/content/Backgrounds/PixelBlast/PixelBlast'),
+    'PixelBlast'
+  ),
   // @ts-ignore
-  plasma: safeLoad(() => import('../../../react-bits/src/content/Backgrounds/Plasma/Plasma'), 'Plasma'),
+  plasma: safeLoad(
+    () => import('../../../react-bits/src/content/Backgrounds/Plasma/Plasma'),
+    'Plasma'
+  ),
   // @ts-ignore
   prism: safeLoad(() => import('../../../react-bits/src/content/Backgrounds/Prism/Prism'), 'Prism'),
   // @ts-ignore
-  'prismatic-burst': safeLoad(() => import('../../../react-bits/src/content/Backgrounds/PrismaticBurst/PrismaticBurst'), 'PrismaticBurst'),
+  'prismatic-burst': safeLoad(
+    () => import('../../../react-bits/src/content/Backgrounds/PrismaticBurst/PrismaticBurst'),
+    'PrismaticBurst'
+  ),
   // @ts-ignore
-  'ripple-grid': safeLoad(() => import('../../../react-bits/src/content/Backgrounds/RippleGrid/RippleGrid'), 'RippleGrid'),
+  'ripple-grid': safeLoad(
+    () => import('../../../react-bits/src/content/Backgrounds/RippleGrid/RippleGrid'),
+    'RippleGrid'
+  ),
   // @ts-ignore
   silk: safeLoad(() => import('../../../react-bits/src/content/Backgrounds/Silk/Silk'), 'Silk'),
   // @ts-ignore
-  squares: safeLoad(() => import('../../../react-bits/src/content/Backgrounds/Squares/Squares'), 'Squares'),
+  squares: safeLoad(
+    () => import('../../../react-bits/src/content/Backgrounds/Squares/Squares'),
+    'Squares'
+  ),
   // @ts-ignore
-  threads: safeLoad(() => import('../../../react-bits/src/content/Backgrounds/Threads/Threads'), 'Threads'),
+  threads: safeLoad(
+    () => import('../../../react-bits/src/content/Backgrounds/Threads/Threads'),
+    'Threads'
+  ),
   // @ts-ignore
   waves: safeLoad(() => import('../../../react-bits/src/content/Backgrounds/Waves/Waves'), 'Waves'),
 };
@@ -144,11 +224,11 @@ class PreviewErrorBoundary extends React.Component<
     return { hasError: true };
   }
 
-  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
+  override componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
     console.error('Preview error:', error, errorInfo);
   }
 
-  render() {
+  override render() {
     if (this.state.hasError) {
       return this.props.fallback;
     }
@@ -167,7 +247,9 @@ export const BackgroundPreview: React.FC<BackgroundPreviewProps> = ({ option }) 
   useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => {
-        setIsVisible(entry.isIntersecting);
+        if (entry) {
+          setIsVisible(entry.isIntersecting);
+        }
       },
       {
         threshold: 0.1,
@@ -185,13 +267,52 @@ export const BackgroundPreview: React.FC<BackgroundPreviewProps> = ({ option }) 
   }, []);
 
   const BackgroundComponent = backgroundComponents[option.id];
-  const hasPreview = Boolean(BackgroundComponent);
+
+  // Type guard to ensure component is defined before rendering
+  if (!BackgroundComponent) {
+    return (
+      <div
+        ref={containerRef}
+        className="w-full h-40 rounded-lg overflow-hidden bg-gray-900 relative"
+        aria-label={`Preview of ${option.title} background`}
+      >
+        <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-gray-800 to-gray-900">
+          <div className="text-center p-4">
+            <svg
+              className="w-12 h-12 mx-auto mb-2 text-gray-600"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+              />
+            </svg>
+            <div className="text-gray-500 text-xs">Preview not available</div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   const errorFallback = (
     <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-red-900/20 to-gray-900">
       <div className="text-center p-4">
-        <svg className="w-10 h-10 mx-auto mb-2 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+        <svg
+          className="w-10 h-10 mx-auto mb-2 text-red-400"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+          />
         </svg>
         <div className="text-red-400 text-xs">Preview error</div>
       </div>
@@ -204,17 +325,7 @@ export const BackgroundPreview: React.FC<BackgroundPreviewProps> = ({ option }) 
       className="w-full h-40 rounded-lg overflow-hidden bg-gray-900 relative"
       aria-label={`Preview of ${option.title} background`}
     >
-      {!hasPreview ? (
-        // No preview available
-        <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-gray-800 to-gray-900">
-          <div className="text-center p-4">
-            <svg className="w-12 h-12 mx-auto mb-2 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-            </svg>
-            <div className="text-gray-500 text-xs">Preview not available</div>
-          </div>
-        </div>
-      ) : isVisible ? (
+      {isVisible ? (
         <PreviewErrorBoundary fallback={errorFallback}>
           <Suspense
             fallback={

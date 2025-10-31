@@ -1,25 +1,26 @@
 import React, { useState, useMemo } from 'react';
 import { useBoltBuilder } from '../../contexts/BoltBuilderContext';
-import { reactBitsAnimations } from '../../data/reactBitsAnimations';
+import { animationOptions as reactBitsAnimations } from '../../data/react-bits';
 import { AnimationOption } from '../../types';
 import { Button } from '../ui/button';
 import { ReactBitsCard } from '../cards/ReactBitsCard';
 import { ReactBitsModal } from '../modals/ReactBitsModal';
 import { SearchFilter } from '../ui/SearchFilter';
+import { useSearchFilter } from '../../hooks/useSearchFilter';
 import ErrorBoundary from '../ErrorBoundary';
 import { StepErrorFallback } from '../StepErrorFallback';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 const ITEMS_PER_PAGE = 6;
 
-// Animation category tags
-const ANIMATION_TAGS = ['Cursor', 'Button', 'Text', 'Hover', 'Scroll', 'Transition'];
+// Extract unique tags from animations
+const ANIMATION_TAGS = Array.from(
+  new Set(reactBitsAnimations.flatMap((anim) => anim.tags || []))
+).sort();
 
 const AnimationsStepContent: React.FC = () => {
   const { selectedAnimations, setSelectedAnimations, setCurrentStep } = useBoltBuilder();
   const [currentPage, setCurrentPage] = useState(1);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [modalState, setModalState] = useState<{
     isOpen: boolean;
     option: AnimationOption | null;
@@ -29,32 +30,19 @@ const AnimationsStepContent: React.FC = () => {
   });
   const [dataLoadError, setDataLoadError] = useState<boolean>(false);
 
-  // Filter animations based on search and tags
-  const filteredAnimations = useMemo(() => {
-    let filtered = reactBitsAnimations;
-    
-    // Apply search filter
-    if (searchQuery.trim()) {
-      const query = searchQuery.toLowerCase();
-      filtered = filtered.filter((anim) =>
-        anim.title.toLowerCase().includes(query) ||
-        anim.description.toLowerCase().includes(query) ||
-        anim.id.toLowerCase().includes(query)
-      );
-    }
-    
-    // Apply tag filter
-    if (selectedTags.length > 0) {
-      filtered = filtered.filter((anim) =>
-        selectedTags.some(tag => 
-          anim.title.toLowerCase().includes(tag.toLowerCase()) ||
-          anim.description.toLowerCase().includes(tag.toLowerCase())
-        )
-      );
-    }
-    
-    return filtered;
-  }, [searchQuery, selectedTags]);
+  // Use search filter hook
+  const {
+    searchQuery,
+    setSearchQuery,
+    selectedTags,
+    toggleTag,
+    filteredItems: filteredAnimations,
+    resultCount,
+  } = useSearchFilter<AnimationOption>(
+    reactBitsAnimations,
+    ['title', 'description', 'id'],
+    (item) => item.tags || []
+  );
 
   // Pagination logic
   const totalPages = Math.ceil(filteredAnimations.length / ITEMS_PER_PAGE);
@@ -69,21 +57,17 @@ const AnimationsStepContent: React.FC = () => {
     setCurrentPage(1);
   }, [searchQuery, selectedTags]);
 
-  // Handle tag toggle
-  const handleTagToggle = React.useCallback((tag: string) => {
-    setSelectedTags((prev) =>
-      prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag]
-    );
-  }, []);
-
   // Memoize toggle handler to prevent unnecessary re-renders of child components
-  const handleToggle = React.useCallback((option: AnimationOption) => {
-    setSelectedAnimations((prev) =>
-      prev.some((item) => item.id === option.id)
-        ? prev.filter((item) => item.id !== option.id)
-        : [...prev, option]
-    );
-  }, [setSelectedAnimations]);
+  const handleToggle = React.useCallback(
+    (option: AnimationOption) => {
+      setSelectedAnimations((prev) =>
+        prev.some((item) => item.id === option.id)
+          ? prev.filter((item) => item.id !== option.id)
+          : [...prev, option]
+      );
+    },
+    [setSelectedAnimations]
+  );
 
   // Memoize view details handler
   const handleViewDetails = React.useCallback((e: React.MouseEvent, option: AnimationOption) => {
@@ -120,33 +104,27 @@ const AnimationsStepContent: React.FC = () => {
   // Show error fallback if data failed to load
   if (dataLoadError) {
     return (
-      <StepErrorFallback
-        stepName="UI/UX Animations"
-        onRetry={handleRetry}
-        onSkip={handleSkip}
-      />
+      <StepErrorFallback stepName="UI/UX Animations" onRetry={handleRetry} onSkip={handleSkip} />
     );
   }
 
   return (
     <div className="space-y-8">
       {/* Screen reader announcement for selection changes */}
-      <div 
-        role="status" 
-        aria-live="polite" 
-        aria-atomic="true"
-        className="sr-only"
-      >
-        {selectedAnimations.length === 0 
-          ? 'No animations selected' 
+      <div role="status" aria-live="polite" aria-atomic="true" className="sr-only">
+        {selectedAnimations.length === 0
+          ? 'No animations selected'
           : `${selectedAnimations.length} animation${selectedAnimations.length === 1 ? '' : 's'} selected`}
       </div>
 
       {/* Header */}
       <div className="animate-slide-up">
-        <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-2 text-white">UI/UX Animations</h2>
+        <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-2 text-white">
+          UI/UX Animations
+        </h2>
         <p className="text-sm sm:text-base text-gray-300" aria-live="polite">
-          Select animations and micro-interactions to enhance user experience. <span className="text-teal-400 font-semibold">{selectedAnimations.length}</span> selected.
+          Select animations and micro-interactions to enhance user experience.{' '}
+          <span className="text-teal-400 font-semibold">{selectedAnimations.length}</span> selected.
         </p>
       </div>
 
@@ -158,7 +136,8 @@ const AnimationsStepContent: React.FC = () => {
           placeholder="Search animations (e.g., blob, magnetic, gooey...)"
           tags={ANIMATION_TAGS}
           selectedTags={selectedTags}
-          onTagToggle={handleTagToggle}
+          onTagToggle={toggleTag}
+          resultCount={resultCount}
         />
       </div>
 
@@ -167,20 +146,30 @@ const AnimationsStepContent: React.FC = () => {
         <div className="absolute inset-0 glass-card" />
         <div className="relative p-4 flex items-center gap-3">
           <div className="bg-teal-500/20 p-2 rounded-lg">
-            <svg className="w-5 h-5 text-teal-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            <svg
+              className="w-5 h-5 text-teal-400"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
             </svg>
           </div>
           <div className="flex-1">
             <p className="text-sm text-gray-300">
-              {searchQuery || selectedTags.length > 0 ? `${filteredAnimations.length} results found` : `${reactBitsAnimations.length} animations available`} • Page {currentPage} of {totalPages}
+              Page {currentPage} of {totalPages}
             </p>
           </div>
         </div>
       </div>
 
       {/* Animation Grid */}
-      <div 
+      <div
         className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
         role="group"
         aria-label="Animation effects selection. Multiple selection allowed."
@@ -209,7 +198,7 @@ const AnimationsStepContent: React.FC = () => {
             <ChevronLeft className="w-4 h-4" />
             Previous
           </Button>
-          
+
           <div className="flex items-center gap-2">
             {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
               <button
@@ -217,9 +206,10 @@ const AnimationsStepContent: React.FC = () => {
                 onClick={() => setCurrentPage(page)}
                 className={`
                   w-10 h-10 rounded-lg transition-all duration-200
-                  ${currentPage === page
-                    ? 'bg-teal-600 text-white font-semibold'
-                    : 'glass-card text-gray-300 hover:text-white hover:bg-white/10'
+                  ${
+                    currentPage === page
+                      ? 'bg-teal-600 text-white font-semibold'
+                      : 'glass-card text-gray-300 hover:text-white hover:bg-white/10'
                   }
                 `}
                 aria-label={`Go to page ${page}`}
@@ -253,7 +243,10 @@ const AnimationsStepContent: React.FC = () => {
             </h3>
             <div className="space-y-2 max-h-64 overflow-y-auto custom-scrollbar">
               {selectedAnimations.map((anim) => (
-                <code key={anim.id} className="block text-xs sm:text-sm text-teal-400 break-all p-2 bg-gray-900/30 rounded transition-colors duration-200 hover:bg-gray-900/50">
+                <code
+                  key={anim.id}
+                  className="block text-xs sm:text-sm text-teal-400 break-all p-2 bg-gray-900/30 rounded transition-colors duration-200 hover:bg-gray-900/50"
+                >
                   {anim.cliCommand}
                 </code>
               ))}
@@ -264,15 +257,15 @@ const AnimationsStepContent: React.FC = () => {
 
       {/* Navigation */}
       <div className="flex flex-col sm:flex-row justify-between gap-4 pt-8">
-        <Button 
-          onClick={React.useCallback(() => setCurrentStep('functionality'), [setCurrentStep])}
+        <Button
+          onClick={() => setCurrentStep('functionality')}
           variant="outline"
           className="w-full sm:w-auto transition-all duration-200 hover:scale-105"
         >
           Back to Functionality
         </Button>
-        
-        <Button 
+
+        <Button
           onClick={handleContinue}
           className="bg-teal-600 hover:bg-teal-700 text-white w-full sm:w-auto transition-all duration-200 hover:scale-105"
         >
@@ -287,7 +280,7 @@ const AnimationsStepContent: React.FC = () => {
             <div className="glass-card rounded-xl max-w-md w-full p-6 text-center">
               <p className="text-white mb-4">Unable to display details</p>
               <Button
-                onClick={React.useCallback(() => setModalState({ isOpen: false, option: null }), [])}
+                onClick={() => setModalState({ isOpen: false, option: null })}
                 variant="outline"
               >
                 Close
@@ -298,7 +291,7 @@ const AnimationsStepContent: React.FC = () => {
       >
         <ReactBitsModal
           isOpen={modalState.isOpen}
-          onClose={React.useCallback(() => setModalState({ isOpen: false, option: null }), [])}
+          onClose={() => setModalState({ isOpen: false, option: null })}
           option={modalState.option}
         />
       </ErrorBoundary>

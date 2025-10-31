@@ -19,11 +19,11 @@ const WelcomePage: React.FC = () => {
     'const [state, setState] =',
     'useEffect(() => {',
     'tailwind.config.js',
-    'git commit -m "init"'
+    'git commit -m "init"',
   ];
 
-  const getRandomSnippet = () => {
-    return codeSnippets[Math.floor(Math.random() * codeSnippets.length)];
+  const getRandomSnippet = (): string => {
+    return codeSnippets[Math.floor(Math.random() * codeSnippets.length)] || '';
   };
 
   // Cleanup on unmount
@@ -77,33 +77,78 @@ const WelcomePage: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-left">
           <div className="glass-card rounded-xl p-6 hover:scale-105 transition-all duration-300">
             <div className="w-12 h-12 bg-blue-500/20 rounded-lg flex items-center justify-center mb-4">
-              <svg className="w-6 h-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+              <svg
+                className="w-6 h-6 text-blue-400"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M13 10V3L4 14h7v7l9-11h-7z"
+                />
               </svg>
             </div>
             <h3 className="text-lg font-semibold text-white mb-2">Smart Wizard</h3>
-            <p className="text-gray-300 text-sm">Intelligent step-by-step guidance through design decisions</p>
+            <p className="text-gray-300 text-sm">
+              Intelligent step-by-step guidance through design decisions
+            </p>
           </div>
 
-          <div className="glass-card rounded-xl p-6 hover:scale-105 transition-all duration-300" style={{ animationDelay: '0.1s' }}>
+          <div
+            className="glass-card rounded-xl p-6 hover:scale-105 transition-all duration-300"
+            style={{ animationDelay: '0.1s' }}
+          >
             <div className="w-12 h-12 bg-purple-500/20 rounded-lg flex items-center justify-center mb-4">
-              <svg className="w-6 h-6 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+              <svg
+                className="w-6 h-6 text-purple-400"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+                />
               </svg>
             </div>
             <h3 className="text-lg font-semibold text-white mb-2">Live Preview</h3>
             <p className="text-gray-300 text-sm">Real-time visualization of your design choices</p>
           </div>
 
-          <div className="glass-card rounded-xl p-6 hover:scale-105 transition-all duration-300" style={{ animationDelay: '0.2s' }}>
+          <div
+            className="glass-card rounded-xl p-6 hover:scale-105 transition-all duration-300"
+            style={{ animationDelay: '0.2s' }}
+          >
             <div className="w-12 h-12 bg-teal-500/20 rounded-lg flex items-center justify-center mb-4">
-              <svg className="w-6 h-6 text-teal-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              <svg
+                className="w-6 h-6 text-teal-400"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                />
               </svg>
             </div>
             <h3 className="text-lg font-semibold text-white mb-2">Perfect Prompts</h3>
-            <p className="text-gray-300 text-sm">Detailed prompts optimized for AI development tools</p>
+            <p className="text-gray-300 text-sm">
+              Detailed prompts optimized for AI development tools
+            </p>
           </div>
         </div>
       </div>
@@ -126,7 +171,12 @@ const WelcomePage: React.FC = () => {
             <span className="text-white flex items-center gap-3">
               Get Started
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M13 7l5 5m0 0l-5 5m5-5H6"
+                />
               </svg>
             </span>
           )}
@@ -143,9 +193,10 @@ const WelcomePage: React.FC = () => {
         <div className="glass-card rounded-xl p-8 text-center">
           <h2 className="text-2xl font-bold text-white mb-4">Why LovaBolt?</h2>
           <p className="text-gray-300 leading-relaxed">
-            Transform your website ideas into detailed, actionable prompts that AI development tools can understand perfectly.
-            Our advanced wizard guides you through every design decision, ensuring your vision is captured with precision
-            and translated into professional development requirements.
+            Transform your website ideas into detailed, actionable prompts that AI development tools
+            can understand perfectly. Our advanced wizard guides you through every design decision,
+            ensuring your vision is captured with precision and translated into professional
+            development requirements.
           </p>
         </div>
       </div>

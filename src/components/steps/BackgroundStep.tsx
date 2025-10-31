@@ -1,29 +1,38 @@
 import React, { useState, useMemo } from 'react';
 import { useBoltBuilder } from '../../contexts/BoltBuilderContext';
-import { reactBitsBackgrounds } from '../../data/reactBitsBackgrounds';
+import { backgroundOptions as reactBitsBackgrounds } from '../../data/react-bits';
 import { backgroundPatterns } from '../../data/wizardData';
 import { BackgroundOption, BackgroundSelection } from '../../types';
 import { Button } from '../ui/button';
 import { ReactBitsCard } from '../cards/ReactBitsCard';
 import { ReactBitsModal } from '../modals/ReactBitsModal';
 import { SearchFilter } from '../ui/SearchFilter';
+import { useSearchFilter } from '../../hooks/useSearchFilter';
 import ErrorBoundary from '../ErrorBoundary';
 import { StepErrorFallback } from '../StepErrorFallback';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 const ITEMS_PER_PAGE = 6;
 
+// Extract unique tags from backgrounds
+const BACKGROUND_TAGS = Array.from(
+  new Set(reactBitsBackgrounds.flatMap((bg) => bg.tags || []))
+).sort();
+
 const BackgroundStepContent: React.FC = () => {
   const { backgroundSelection, setBackgroundSelection, setCurrentStep } = useBoltBuilder();
-  const [backgroundType, setBackgroundType] = useState<'solid' | 'gradient' | 'pattern' | 'react-bits'>(
-    backgroundSelection?.type || 'solid'
-  );
+  const [backgroundType, setBackgroundType] = useState<
+    'solid' | 'gradient' | 'pattern' | 'react-bits'
+  >(backgroundSelection?.type || 'solid');
   const [solidColor, setSolidColor] = useState(backgroundSelection?.solidColor || '#1F2937');
-  const [gradientColors, setGradientColors] = useState(backgroundSelection?.gradientColors || ['#3B82F6', '#8B5CF6']);
-  const [gradientDirection, setGradientDirection] = useState(backgroundSelection?.gradientDirection || 'to right');
+  const [gradientColors, setGradientColors] = useState(
+    backgroundSelection?.gradientColors || ['#3B82F6', '#8B5CF6']
+  );
+  const [gradientDirection, setGradientDirection] = useState(
+    backgroundSelection?.gradientDirection || 'to right'
+  );
   const [selectedPattern, setSelectedPattern] = useState(backgroundSelection?.pattern || '');
   const [currentPage, setCurrentPage] = useState(1);
-  const [searchQuery, setSearchQuery] = useState('');
   const [modalState, setModalState] = useState<{
     isOpen: boolean;
     option: BackgroundOption | null;
@@ -32,17 +41,19 @@ const BackgroundStepContent: React.FC = () => {
     option: null,
   });
 
-  // Filter backgrounds based on search
-  const filteredBackgrounds = useMemo(() => {
-    if (!searchQuery.trim()) return reactBitsBackgrounds;
-    
-    const query = searchQuery.toLowerCase();
-    return reactBitsBackgrounds.filter((bg) =>
-      bg.title.toLowerCase().includes(query) ||
-      bg.description.toLowerCase().includes(query) ||
-      bg.id.toLowerCase().includes(query)
-    );
-  }, [searchQuery]);
+  // Use search filter hook
+  const {
+    searchQuery,
+    setSearchQuery,
+    selectedTags,
+    toggleTag,
+    filteredItems: filteredBackgrounds,
+    resultCount,
+  } = useSearchFilter<BackgroundOption>(
+    reactBitsBackgrounds,
+    ['title', 'description', 'id'],
+    (item) => item.tags || []
+  );
 
   // Pagination logic
   const totalPages = Math.ceil(filteredBackgrounds.length / ITEMS_PER_PAGE);
@@ -52,10 +63,10 @@ const BackgroundStepContent: React.FC = () => {
     return filteredBackgrounds.slice(startIndex, endIndex);
   }, [currentPage, filteredBackgrounds]);
 
-  // Reset to page 1 when search changes
+  // Reset to page 1 when filters change
   React.useEffect(() => {
     setCurrentPage(1);
-  }, [searchQuery]);
+  }, [searchQuery, selectedTags]);
 
   const handleTypeChange = (type: 'solid' | 'gradient' | 'pattern' | 'react-bits') => {
     setBackgroundType(type);
@@ -198,8 +209,18 @@ const BackgroundStepContent: React.FC = () => {
           <div className="absolute inset-0 glass-card" />
           <div className="relative text-center">
             <div className="w-12 h-12 mx-auto mb-2 rounded-lg bg-gradient-to-br from-teal-500 to-blue-600 flex items-center justify-center">
-              <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+              <svg
+                className="w-6 h-6 text-white"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M13 10V3L4 14h7v7l9-11h-7z"
+                />
               </svg>
             </div>
             <p className="text-white font-medium text-sm">React-Bits</p>
@@ -235,7 +256,7 @@ const BackgroundStepContent: React.FC = () => {
           <div className="absolute inset-0 glass-card" />
           <div className="relative p-6 space-y-4">
             <h3 className="text-lg font-semibold text-white mb-4">Gradient Colors</h3>
-            
+
             <div className="flex items-center gap-4">
               <div>
                 <label className="text-sm text-gray-300 mb-2 block">Color 1</label>
@@ -278,10 +299,10 @@ const BackgroundStepContent: React.FC = () => {
               </select>
             </div>
 
-            <div 
+            <div
               className="w-full h-32 rounded-lg"
               style={{
-                background: `linear-gradient(${gradientDirection}, ${gradientColors[0]}, ${gradientColors[1]})`
+                background: `linear-gradient(${gradientDirection}, ${gradientColors[0]}, ${gradientColors[1]})`,
               }}
             />
           </div>
@@ -302,16 +323,18 @@ const BackgroundStepContent: React.FC = () => {
             >
               <div className="absolute inset-0 glass-card" />
               <div className="relative">
-                <div className="w-full h-24 rounded-lg mb-3 bg-gray-800" 
+                <div
+                  className="w-full h-24 rounded-lg mb-3 bg-gray-800"
                   style={{
-                    backgroundImage: pattern.id === 'geometric' 
-                      ? 'repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(255,255,255,.05) 10px, rgba(255,255,255,.05) 20px)'
-                      : pattern.id === 'organic'
-                      ? 'radial-gradient(circle at 20% 50%, rgba(255,255,255,.05) 0%, transparent 50%), radial-gradient(circle at 80% 80%, rgba(255,255,255,.05) 0%, transparent 50%)'
-                      : pattern.id === 'abstract'
-                      ? 'linear-gradient(45deg, rgba(255,255,255,.05) 25%, transparent 25%, transparent 75%, rgba(255,255,255,.05) 75%), linear-gradient(-45deg, rgba(255,255,255,.05) 25%, transparent 25%, transparent 75%, rgba(255,255,255,.05) 75%)'
-                      : 'repeating-linear-gradient(0deg, transparent, transparent 20px, rgba(255,255,255,.03) 20px, rgba(255,255,255,.03) 40px)',
-                    backgroundSize: pattern.id === 'abstract' ? '20px 20px' : 'auto'
+                    backgroundImage:
+                      pattern.id === 'geometric'
+                        ? 'repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(255,255,255,.05) 10px, rgba(255,255,255,.05) 20px)'
+                        : pattern.id === 'organic'
+                          ? 'radial-gradient(circle at 20% 50%, rgba(255,255,255,.05) 0%, transparent 50%), radial-gradient(circle at 80% 80%, rgba(255,255,255,.05) 0%, transparent 50%)'
+                          : pattern.id === 'abstract'
+                            ? 'linear-gradient(45deg, rgba(255,255,255,.05) 25%, transparent 25%, transparent 75%, rgba(255,255,255,.05) 75%), linear-gradient(-45deg, rgba(255,255,255,.05) 25%, transparent 25%, transparent 75%, rgba(255,255,255,.05) 75%)'
+                            : 'repeating-linear-gradient(0deg, transparent, transparent 20px, rgba(255,255,255,.03) 20px, rgba(255,255,255,.03) 40px)',
+                    backgroundSize: pattern.id === 'abstract' ? '20px 20px' : 'auto',
                   }}
                 />
                 <h4 className="text-white font-medium text-sm mb-1">{pattern.title}</h4>
@@ -330,6 +353,10 @@ const BackgroundStepContent: React.FC = () => {
             value={searchQuery}
             onChange={setSearchQuery}
             placeholder="Search backgrounds (e.g., aurora, gooey, particles...)"
+            tags={BACKGROUND_TAGS}
+            selectedTags={selectedTags}
+            onTagToggle={toggleTag}
+            resultCount={resultCount}
           />
 
           {/* Info banner */}
@@ -337,13 +364,23 @@ const BackgroundStepContent: React.FC = () => {
             <div className="absolute inset-0 glass-card" />
             <div className="relative p-4 flex items-center gap-3">
               <div className="bg-teal-500/20 p-2 rounded-lg">
-                <svg className="w-5 h-5 text-teal-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                <svg
+                  className="w-5 h-5 text-teal-400"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                  />
                 </svg>
               </div>
               <div className="flex-1">
                 <p className="text-sm text-gray-300">
-                  {searchQuery ? `${filteredBackgrounds.length} results found` : `${reactBitsBackgrounds.length} backgrounds available`} • Page {currentPage} of {totalPages}
+                  Page {currentPage} of {totalPages}
                 </p>
               </div>
             </div>
@@ -375,7 +412,7 @@ const BackgroundStepContent: React.FC = () => {
                 <ChevronLeft className="w-4 h-4" />
                 Previous
               </Button>
-              
+
               <div className="flex items-center gap-2">
                 {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
                   <button
@@ -383,9 +420,10 @@ const BackgroundStepContent: React.FC = () => {
                     onClick={() => setCurrentPage(page)}
                     className={`
                       w-10 h-10 rounded-lg transition-all duration-200
-                      ${currentPage === page
-                        ? 'bg-teal-600 text-white font-semibold'
-                        : 'glass-card text-gray-300 hover:text-white hover:bg-white/10'
+                      ${
+                        currentPage === page
+                          ? 'bg-teal-600 text-white font-semibold'
+                          : 'glass-card text-gray-300 hover:text-white hover:bg-white/10'
                       }
                     `}
                     aria-label={`Go to page ${page}`}
@@ -412,8 +450,8 @@ const BackgroundStepContent: React.FC = () => {
 
       {/* Navigation */}
       <div className="flex flex-col sm:flex-row justify-between gap-4 pt-8">
-        <Button 
-          onClick={handleBack} 
+        <Button
+          onClick={handleBack}
           variant="outline"
           className="w-full sm:w-auto transition-all duration-200 hover:scale-105"
         >

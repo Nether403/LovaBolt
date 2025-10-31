@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useEffect, useRef, useState, Suspense, lazy } from 'react';
 import { ReactBitsComponent } from '../../types';
 
@@ -44,11 +46,17 @@ import '../../../react-bits/src/content/Components/TiltedCard/TiltedCard.css';
 // @ts-ignore - React-bits components are JSX without type definitions
 const componentComponents: Record<string, React.LazyExoticComponent<any>> = {
   // @ts-ignore
-  'animated-list': lazy(() => import('../../../react-bits/src/content/Components/AnimatedList/AnimatedList')),
+  'animated-list': lazy(
+    () => import('../../../react-bits/src/content/Components/AnimatedList/AnimatedList')
+  ),
   // @ts-ignore
-  'bounce-cards': lazy(() => import('../../../react-bits/src/content/Components/BounceCards/BounceCards')),
+  'bounce-cards': lazy(
+    () => import('../../../react-bits/src/content/Components/BounceCards/BounceCards')
+  ),
   // @ts-ignore
-  'bubble-menu': lazy(() => import('../../../react-bits/src/content/Components/BubbleMenu/BubbleMenu')),
+  'bubble-menu': lazy(
+    () => import('../../../react-bits/src/content/Components/BubbleMenu/BubbleMenu')
+  ),
   // @ts-ignore
   'card-nav': lazy(() => import('../../../react-bits/src/content/Components/CardNav/CardNav')),
   // @ts-ignore
@@ -56,63 +64,103 @@ const componentComponents: Record<string, React.LazyExoticComponent<any>> = {
   // @ts-ignore
   carousel: lazy(() => import('../../../react-bits/src/content/Components/Carousel/Carousel')),
   // @ts-ignore
-  'chroma-grid': lazy(() => import('../../../react-bits/src/content/Components/ChromaGrid/ChromaGrid')),
+  'chroma-grid': lazy(
+    () => import('../../../react-bits/src/content/Components/ChromaGrid/ChromaGrid')
+  ),
   // @ts-ignore
-  'circular-gallery': lazy(() => import('../../../react-bits/src/content/Components/CircularGallery/CircularGallery')),
+  'circular-gallery': lazy(
+    () => import('../../../react-bits/src/content/Components/CircularGallery/CircularGallery')
+  ),
   // @ts-ignore
   counter: lazy(() => import('../../../react-bits/src/content/Components/Counter/Counter')),
   // @ts-ignore
-  'decay-card': lazy(() => import('../../../react-bits/src/content/Components/DecayCard/DecayCard')),
+  'decay-card': lazy(
+    () => import('../../../react-bits/src/content/Components/DecayCard/DecayCard')
+  ),
   // @ts-ignore
   dock: lazy(() => import('../../../react-bits/src/content/Components/Dock/Dock')),
   // @ts-ignore
-  'dome-gallery': lazy(() => import('../../../react-bits/src/content/Components/DomeGallery/DomeGallery')),
+  'dome-gallery': lazy(
+    () => import('../../../react-bits/src/content/Components/DomeGallery/DomeGallery')
+  ),
   // @ts-ignore
-  'elastic-slider': lazy(() => import('../../../react-bits/src/content/Components/ElasticSlider/ElasticSlider')),
+  'elastic-slider': lazy(
+    () => import('../../../react-bits/src/content/Components/ElasticSlider/ElasticSlider')
+  ),
   // @ts-ignore
-  'flowing-menu': lazy(() => import('../../../react-bits/src/content/Components/FlowingMenu/FlowingMenu')),
+  'flowing-menu': lazy(
+    () => import('../../../react-bits/src/content/Components/FlowingMenu/FlowingMenu')
+  ),
   // @ts-ignore
-  'fluid-glass': lazy(() => import('../../../react-bits/src/content/Components/FluidGlass/FluidGlass')),
+  'fluid-glass': lazy(
+    () => import('../../../react-bits/src/content/Components/FluidGlass/FluidGlass')
+  ),
   // @ts-ignore
-  'flying-posters': lazy(() => import('../../../react-bits/src/content/Components/FlyingPosters/FlyingPosters')),
+  'flying-posters': lazy(
+    () => import('../../../react-bits/src/content/Components/FlyingPosters/FlyingPosters')
+  ),
   // @ts-ignore
   folder: lazy(() => import('../../../react-bits/src/content/Components/Folder/Folder')),
   // @ts-ignore
-  'glass-icons': lazy(() => import('../../../react-bits/src/content/Components/GlassIcons/GlassIcons')),
+  'glass-icons': lazy(
+    () => import('../../../react-bits/src/content/Components/GlassIcons/GlassIcons')
+  ),
   // @ts-ignore
-  'glass-surface': lazy(() => import('../../../react-bits/src/content/Components/GlassSurface/GlassSurface')),
+  'glass-surface': lazy(
+    () => import('../../../react-bits/src/content/Components/GlassSurface/GlassSurface')
+  ),
   // @ts-ignore
   'gooey-nav': lazy(() => import('../../../react-bits/src/content/Components/GooeyNav/GooeyNav')),
   // @ts-ignore
-  'infinite-menu': lazy(() => import('../../../react-bits/src/content/Components/InfiniteMenu/InfiniteMenu')),
+  'infinite-menu': lazy(
+    () => import('../../../react-bits/src/content/Components/InfiniteMenu/InfiniteMenu')
+  ),
   // @ts-ignore
-  'infinite-scroll': lazy(() => import('../../../react-bits/src/content/Components/InfiniteScroll/InfiniteScroll')),
+  'infinite-scroll': lazy(
+    () => import('../../../react-bits/src/content/Components/InfiniteScroll/InfiniteScroll')
+  ),
   // @ts-ignore
   lanyard: lazy(() => import('../../../react-bits/src/content/Components/Lanyard/Lanyard')),
   // @ts-ignore
-  'magic-bento': lazy(() => import('../../../react-bits/src/content/Components/MagicBento/MagicBento')),
+  'magic-bento': lazy(
+    () => import('../../../react-bits/src/content/Components/MagicBento/MagicBento')
+  ),
   // @ts-ignore
   masonry: lazy(() => import('../../../react-bits/src/content/Components/Masonry/Masonry')),
   // @ts-ignore
-  'model-viewer': lazy(() => import('../../../react-bits/src/content/Components/ModelViewer/ModelViewer')),
+  'model-viewer': lazy(
+    () => import('../../../react-bits/src/content/Components/ModelViewer/ModelViewer')
+  ),
   // @ts-ignore
   'pill-nav': lazy(() => import('../../../react-bits/src/content/Components/PillNav/PillNav')),
   // @ts-ignore
-  'pixel-card': lazy(() => import('../../../react-bits/src/content/Components/PixelCard/PixelCard')),
+  'pixel-card': lazy(
+    () => import('../../../react-bits/src/content/Components/PixelCard/PixelCard')
+  ),
   // @ts-ignore
-  'profile-card': lazy(() => import('../../../react-bits/src/content/Components/ProfileCard/ProfileCard')),
+  'profile-card': lazy(
+    () => import('../../../react-bits/src/content/Components/ProfileCard/ProfileCard')
+  ),
   // @ts-ignore
-  'scroll-stack': lazy(() => import('../../../react-bits/src/content/Components/ScrollStack/ScrollStack')),
+  'scroll-stack': lazy(
+    () => import('../../../react-bits/src/content/Components/ScrollStack/ScrollStack')
+  ),
   // @ts-ignore
-  'spotlight-card': lazy(() => import('../../../react-bits/src/content/Components/SpotlightCard/SpotlightCard')),
+  'spotlight-card': lazy(
+    () => import('../../../react-bits/src/content/Components/SpotlightCard/SpotlightCard')
+  ),
   // @ts-ignore
   stack: lazy(() => import('../../../react-bits/src/content/Components/Stack/Stack')),
   // @ts-ignore
-  'staggered-menu': lazy(() => import('../../../react-bits/src/content/Components/StaggeredMenu/StaggeredMenu')),
+  'staggered-menu': lazy(
+    () => import('../../../react-bits/src/content/Components/StaggeredMenu/StaggeredMenu')
+  ),
   // @ts-ignore
   stepper: lazy(() => import('../../../react-bits/src/content/Components/Stepper/Stepper')),
   // @ts-ignore
-  'tilted-card': lazy(() => import('../../../react-bits/src/content/Components/TiltedCard/TiltedCard')),
+  'tilted-card': lazy(
+    () => import('../../../react-bits/src/content/Components/TiltedCard/TiltedCard')
+  ),
 };
 
 // Default props for each component (optimized for small preview)
@@ -133,7 +181,9 @@ export const ComponentPreview: React.FC<ComponentPreviewProps> = ({ option }) =>
   useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => {
-        setIsVisible(entry.isIntersecting);
+        if (entry) {
+          setIsVisible(entry.isIntersecting);
+        }
       },
       {
         threshold: 0.1,
@@ -151,16 +201,15 @@ export const ComponentPreview: React.FC<ComponentPreviewProps> = ({ option }) =>
   }, []);
 
   const ComponentComponent = componentComponents[option.id];
-  const hasPreview = Boolean(ComponentComponent);
 
-  return (
-    <div
-      ref={containerRef}
-      className="w-full h-40 rounded-lg overflow-hidden bg-gray-900 relative"
-      aria-label={`Preview of ${option.title} component`}
-    >
-      {!hasPreview ? (
-        // No preview available for this component
+  // Type guard to ensure component is defined before rendering
+  if (!ComponentComponent) {
+    return (
+      <div
+        ref={containerRef}
+        className="w-full h-40 rounded-lg overflow-hidden bg-gray-900 relative"
+        aria-label={`Preview of ${option.title} component`}
+      >
         <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-gray-800 to-gray-900">
           <div className="text-center p-4">
             <svg
@@ -179,7 +228,17 @@ export const ComponentPreview: React.FC<ComponentPreviewProps> = ({ option }) =>
             <div className="text-gray-500 text-xs">Preview not available</div>
           </div>
         </div>
-      ) : isVisible ? (
+      </div>
+    );
+  }
+
+  return (
+    <div
+      ref={containerRef}
+      className="w-full h-40 rounded-lg overflow-hidden bg-gray-900 relative"
+      aria-label={`Preview of ${option.title} component`}
+    >
+      {isVisible ? (
         <Suspense
           fallback={
             <div className="w-full h-full flex items-center justify-center bg-gray-800">

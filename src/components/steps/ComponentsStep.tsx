@@ -1,11 +1,12 @@
 import React, { useState, useMemo } from 'react';
 import { useBoltBuilder } from '../../contexts/BoltBuilderContext';
-import { reactBitsComponents } from '../../data/reactBitsComponents';
+import { componentOptions as reactBitsComponents } from '../../data/react-bits';
 import { ComponentOption } from '../../types';
 import { Button } from '../ui/button';
 import { ReactBitsCard } from '../cards/ReactBitsCard';
 import { ReactBitsModal } from '../modals/ReactBitsModal';
 import { SearchFilter } from '../ui/SearchFilter';
+import { useSearchFilter } from '../../hooks/useSearchFilter';
 import ErrorBoundary from '../ErrorBoundary';
 import { StepErrorFallback } from '../StepErrorFallback';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
@@ -13,13 +14,13 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 const ITEMS_PER_PAGE = 6;
 
 // Extract unique tags from components
-const COMPONENT_TAGS = ['Navigation', 'Input', 'Display', 'Feedback', 'Layout', 'Interactive'];
+const COMPONENT_TAGS = Array.from(
+  new Set(reactBitsComponents.flatMap((comp) => comp.tags || []))
+).sort();
 
 const ComponentsStepContent: React.FC = () => {
   const { selectedComponents, setSelectedComponents, setCurrentStep } = useBoltBuilder();
   const [currentPage, setCurrentPage] = useState(1);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [modalState, setModalState] = useState<{
     isOpen: boolean;
     option: ComponentOption | null;
@@ -29,32 +30,19 @@ const ComponentsStepContent: React.FC = () => {
   });
   const [dataLoadError, setDataLoadError] = useState<boolean>(false);
 
-  // Filter components based on search and tags
-  const filteredComponents = useMemo(() => {
-    let filtered = reactBitsComponents;
-    
-    // Apply search filter
-    if (searchQuery.trim()) {
-      const query = searchQuery.toLowerCase();
-      filtered = filtered.filter((comp) =>
-        comp.title.toLowerCase().includes(query) ||
-        comp.description.toLowerCase().includes(query) ||
-        comp.id.toLowerCase().includes(query)
-      );
-    }
-    
-    // Apply tag filter
-    if (selectedTags.length > 0) {
-      filtered = filtered.filter((comp) =>
-        selectedTags.some(tag => 
-          comp.title.toLowerCase().includes(tag.toLowerCase()) ||
-          comp.description.toLowerCase().includes(tag.toLowerCase())
-        )
-      );
-    }
-    
-    return filtered;
-  }, [searchQuery, selectedTags]);
+  // Use search filter hook
+  const {
+    searchQuery,
+    setSearchQuery,
+    selectedTags,
+    toggleTag,
+    filteredItems: filteredComponents,
+    resultCount,
+  } = useSearchFilter<ComponentOption>(
+    reactBitsComponents,
+    ['title', 'description', 'id'],
+    (item) => item.tags || []
+  );
 
   // Pagination logic
   const totalPages = Math.ceil(filteredComponents.length / ITEMS_PER_PAGE);
@@ -69,21 +57,17 @@ const ComponentsStepContent: React.FC = () => {
     setCurrentPage(1);
   }, [searchQuery, selectedTags]);
 
-  // Handle tag toggle
-  const handleTagToggle = React.useCallback((tag: string) => {
-    setSelectedTags((prev) =>
-      prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag]
-    );
-  }, []);
-
   // Memoize toggle handler to prevent unnecessary re-renders of child components
-  const handleToggle = React.useCallback((option: ComponentOption) => {
-    setSelectedComponents((prev) =>
-      prev.some((item) => item.id === option.id)
-        ? prev.filter((item) => item.id !== option.id)
-        : [...prev, option]
-    );
-  }, [setSelectedComponents]);
+  const handleToggle = React.useCallback(
+    (option: ComponentOption) => {
+      setSelectedComponents((prev) =>
+        prev.some((item) => item.id === option.id)
+          ? prev.filter((item) => item.id !== option.id)
+          : [...prev, option]
+      );
+    },
+    [setSelectedComponents]
+  );
 
   // Memoize view details handler
   const handleViewDetails = React.useCallback((e: React.MouseEvent, option: ComponentOption) => {
@@ -123,34 +107,26 @@ const ComponentsStepContent: React.FC = () => {
 
   // Show error fallback if data failed to load
   if (dataLoadError) {
-    return (
-      <StepErrorFallback
-        stepName="UI Components"
-        onRetry={handleRetry}
-        onSkip={handleSkip}
-      />
-    );
+    return <StepErrorFallback stepName="UI Components" onRetry={handleRetry} onSkip={handleSkip} />;
   }
 
   return (
     <div className="space-y-8">
       {/* Screen reader announcement for selection changes */}
-      <div 
-        role="status" 
-        aria-live="polite" 
-        aria-atomic="true"
-        className="sr-only"
-      >
-        {selectedComponents.length === 0 
-          ? 'No components selected' 
+      <div role="status" aria-live="polite" aria-atomic="true" className="sr-only">
+        {selectedComponents.length === 0
+          ? 'No components selected'
           : `${selectedComponents.length} component${selectedComponents.length === 1 ? '' : 's'} selected`}
       </div>
 
       {/* Header with count */}
       <div className="animate-slide-up">
-        <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-2 text-white">UI Components</h2>
+        <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-2 text-white">
+          UI Components
+        </h2>
         <p className="text-sm sm:text-base text-gray-300" aria-live="polite">
-          Select components to enhance your interface. <span className="text-teal-400 font-semibold">{selectedComponents.length}</span> selected.
+          Select components to enhance your interface.{' '}
+          <span className="text-teal-400 font-semibold">{selectedComponents.length}</span> selected.
         </p>
       </div>
 
@@ -162,7 +138,8 @@ const ComponentsStepContent: React.FC = () => {
           placeholder="Search components (e.g., carousel, dock, accordion...)"
           tags={COMPONENT_TAGS}
           selectedTags={selectedTags}
-          onTagToggle={handleTagToggle}
+          onTagToggle={toggleTag}
+          resultCount={resultCount}
         />
       </div>
 
@@ -171,20 +148,30 @@ const ComponentsStepContent: React.FC = () => {
         <div className="absolute inset-0 glass-card" />
         <div className="relative p-4 flex items-center gap-3">
           <div className="bg-teal-500/20 p-2 rounded-lg">
-            <svg className="w-5 h-5 text-teal-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            <svg
+              className="w-5 h-5 text-teal-400"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
             </svg>
           </div>
           <div className="flex-1">
             <p className="text-sm text-gray-300">
-              {searchQuery || selectedTags.length > 0 ? `${filteredComponents.length} results found` : `${reactBitsComponents.length} components available`} • Page {currentPage} of {totalPages}
+              Page {currentPage} of {totalPages}
             </p>
           </div>
         </div>
       </div>
 
       {/* Grid of components */}
-      <div 
+      <div
         className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
         role="group"
         aria-label="UI components selection. Multiple selection allowed."
@@ -213,7 +200,7 @@ const ComponentsStepContent: React.FC = () => {
             <ChevronLeft className="w-4 h-4" />
             Previous
           </Button>
-          
+
           <div className="flex items-center gap-2">
             {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
               <button
@@ -221,9 +208,10 @@ const ComponentsStepContent: React.FC = () => {
                 onClick={() => setCurrentPage(page)}
                 className={`
                   w-10 h-10 rounded-lg transition-all duration-200
-                  ${currentPage === page
-                    ? 'bg-teal-600 text-white font-semibold'
-                    : 'glass-card text-gray-300 hover:text-white hover:bg-white/10'
+                  ${
+                    currentPage === page
+                      ? 'bg-teal-600 text-white font-semibold'
+                      : 'glass-card text-gray-300 hover:text-white hover:bg-white/10'
                   }
                 `}
                 aria-label={`Go to page ${page}`}
@@ -257,7 +245,10 @@ const ComponentsStepContent: React.FC = () => {
             </h3>
             <div className="space-y-2 max-h-64 overflow-y-auto custom-scrollbar">
               {selectedComponents.map((comp) => (
-                <code key={comp.id} className="block text-xs sm:text-sm text-teal-400 break-all p-2 bg-gray-900/30 rounded transition-colors duration-200 hover:bg-gray-900/50">
+                <code
+                  key={comp.id}
+                  className="block text-xs sm:text-sm text-teal-400 break-all p-2 bg-gray-900/30 rounded transition-colors duration-200 hover:bg-gray-900/50"
+                >
                   {comp.cliCommand}
                 </code>
               ))}
@@ -268,15 +259,15 @@ const ComponentsStepContent: React.FC = () => {
 
       {/* Navigation */}
       <div className="flex flex-col sm:flex-row justify-between gap-4 pt-8">
-        <Button 
-          onClick={handleBack} 
+        <Button
+          onClick={handleBack}
           variant="outline"
           className="w-full sm:w-auto transition-all duration-200 hover:scale-105"
         >
           Back to Background
         </Button>
-        <Button 
-          onClick={handleContinue} 
+        <Button
+          onClick={handleContinue}
           className="bg-teal-600 hover:bg-teal-700 text-white w-full sm:w-auto transition-all duration-200 hover:scale-105"
         >
           Continue to Animations
@@ -290,7 +281,7 @@ const ComponentsStepContent: React.FC = () => {
             <div className="glass-card rounded-xl max-w-md w-full p-6 text-center">
               <p className="text-white mb-4">Unable to display details</p>
               <Button
-                onClick={React.useCallback(() => setModalState({ isOpen: false, option: null }), [])}
+                onClick={() => setModalState({ isOpen: false, option: null })}
                 variant="outline"
               >
                 Close
@@ -301,7 +292,7 @@ const ComponentsStepContent: React.FC = () => {
       >
         <ReactBitsModal
           isOpen={modalState.isOpen}
-          onClose={React.useCallback(() => setModalState({ isOpen: false, option: null }), [])}
+          onClose={() => setModalState({ isOpen: false, option: null })}
           option={modalState.option}
         />
       </ErrorBoundary>

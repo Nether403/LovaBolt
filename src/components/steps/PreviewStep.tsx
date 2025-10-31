@@ -17,9 +17,9 @@ const PreviewStep: React.FC = () => {
     setPromptText,
     setPromptType,
     promptText,
-    promptType
+    promptType,
   } = useBoltBuilder();
-  
+
   const [isPromptModalOpen, setIsPromptModalOpen] = useState(false);
 
   const generatePromptType = (type: 'basic' | 'detailed') => {
@@ -43,19 +43,21 @@ const PreviewStep: React.FC = () => {
           <h3 className="font-bold text-lg mb-3 text-white">Project Information</h3>
           {projectInfo.name ? (
             <div className="space-y-2">
-              <p className="text-white"><span className="font-semibold">Name:</span> {projectInfo.name}</p>
-              <p className="text-white"><span className="font-semibold">Type:</span> {projectInfo.type}</p>
-              <p className="text-white"><span className="font-semibold">Purpose:</span> {projectInfo.purpose}</p>
+              <p className="text-white">
+                <span className="font-semibold">Name:</span> {projectInfo.name}
+              </p>
+              <p className="text-white">
+                <span className="font-semibold">Type:</span> {projectInfo.type}
+              </p>
+              <p className="text-white">
+                <span className="font-semibold">Purpose:</span> {projectInfo.purpose}
+              </p>
               <p className="text-gray-300 text-sm mt-3">{projectInfo.description}</p>
             </div>
           ) : (
             <p className="text-red-400">Project information missing</p>
           )}
-          <Button 
-            onClick={() => setCurrentStep('project-setup')}
-            className="mt-4"
-            size="sm"
-          >
+          <Button onClick={() => setCurrentStep('project-setup')} className="mt-4" size="sm">
             Edit Project Info
           </Button>
         </div>
@@ -71,11 +73,7 @@ const PreviewStep: React.FC = () => {
           ) : (
             <p className="text-red-400">Layout not selected</p>
           )}
-          <Button 
-            onClick={() => setCurrentStep('layout')}
-            className="mt-4"
-            size="sm"
-          >
+          <Button onClick={() => setCurrentStep('layout')} className="mt-4" size="sm">
             Edit Layout
           </Button>
         </div>
@@ -91,11 +89,7 @@ const PreviewStep: React.FC = () => {
           ) : (
             <p className="text-red-400">Design style not selected</p>
           )}
-          <Button 
-            onClick={() => setCurrentStep('design-style')}
-            className="mt-4"
-            size="sm"
-          >
+          <Button onClick={() => setCurrentStep('design-style')} className="mt-4" size="sm">
             Edit Design Style
           </Button>
         </div>
@@ -120,11 +114,7 @@ const PreviewStep: React.FC = () => {
           ) : (
             <p className="text-red-400">Color theme not selected</p>
           )}
-          <Button 
-            onClick={() => setCurrentStep('color-theme')}
-            className="mt-4"
-            size="sm"
-          >
+          <Button onClick={() => setCurrentStep('color-theme')} className="mt-4" size="sm">
             Edit Color Theme
           </Button>
         </div>
@@ -132,26 +122,34 @@ const PreviewStep: React.FC = () => {
         {/* Typography */}
         <div className="glass-card rounded-lg p-6">
           <h3 className="font-bold text-lg mb-3 text-white">Typography</h3>
-          <div 
-            className="p-3 bg-white/5 backdrop-blur-sm rounded-lg border border-white/10"
-            style={{ 
-              fontFamily: selectedTypography.fontFamily,
-              textAlign: selectedTypography.textAlignment.toLowerCase() as any
-            }}
-          >
-            <p className="text-lg mb-1 text-white" style={{ 
-              fontWeight: selectedTypography.headingWeight === 'Bold' ? '700' : 
-                         selectedTypography.headingWeight === 'Light' ? '300' : '400'
-            }}>
-              {selectedTypography.fontFamily.split(',')[0].replace(/'/g, '')}
-            </p>
-            <p className="text-sm text-gray-300">Sample typography preview</p>
-          </div>
-          <Button 
-            onClick={() => setCurrentStep('typography')}
-            className="mt-4"
-            size="sm"
-          >
+          {selectedTypography ? (
+            <div
+              className="p-3 bg-white/5 backdrop-blur-sm rounded-lg border border-white/10"
+              style={{
+                fontFamily: selectedTypography.fontFamily,
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                textAlign: selectedTypography.textAlignment.toLowerCase() as any,
+              }}
+            >
+              <p
+                className="text-lg mb-1 text-white"
+                style={{
+                  fontWeight:
+                    selectedTypography.headingWeight === 'Bold'
+                      ? '700'
+                      : selectedTypography.headingWeight === 'Light'
+                        ? '300'
+                        : '400',
+                }}
+              >
+                {selectedTypography.fontFamily.split(',')[0]?.replace(/'/g, '')}
+              </p>
+              <p className="text-sm text-gray-300">Sample typography preview</p>
+            </div>
+          ) : (
+            <p className="text-red-400">Typography not selected</p>
+          )}
+          <Button onClick={() => setCurrentStep('typography')} className="mt-4" size="sm">
             Edit Typography
           </Button>
         </div>
@@ -170,11 +168,7 @@ const PreviewStep: React.FC = () => {
           ) : (
             <p className="text-gray-400 italic">No functionality selected</p>
           )}
-          <Button 
-            onClick={() => setCurrentStep('functionality')}
-            className="mt-4"
-            size="sm"
-          >
+          <Button onClick={() => setCurrentStep('functionality')} className="mt-4" size="sm">
             Edit Functionality
           </Button>
         </div>
@@ -182,7 +176,7 @@ const PreviewStep: React.FC = () => {
 
       {/* Generate Prompt */}
       <div className="flex justify-center pt-8">
-        <Button 
+        <Button
           onClick={() => {
             generatePromptType('detailed');
             setIsPromptModalOpen(true);

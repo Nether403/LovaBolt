@@ -1,58 +1,47 @@
 import React, { useState } from 'react';
 import { Info } from 'lucide-react';
-import { z } from 'zod';
 import { useBoltBuilder } from '../../contexts/BoltBuilderContext';
 import { Button } from '../ui/button';
 import InfoModal from '../modals/InfoModal';
 import DescriptionHelpModal from '../modals/DescriptionHelpModal';
-
-// Zod validation schema
-const projectSetupSchema = z.object({
-  name: z.string()
-    .min(1, 'Project name is required')
-    .min(3, 'Project name must be at least 3 characters')
-    .max(100, 'Project name must be less than 100 characters'),
-  description: z.string()
-    .min(1, 'Project description is required')
-    .min(10, 'Description must be at least 10 characters')
-    .max(500, 'Description must be less than 500 characters'),
-  type: z.string(),
-  purpose: z.string(),
-  targetAudience: z.string().optional(),
-});
+import { projectInfoSchema } from '../../types/validation';
+import { z } from 'zod';
 
 const ProjectSetupStep: React.FC = () => {
   const { projectInfo, setProjectInfo, setCurrentStep } = useBoltBuilder();
   const [showInfoModal, setShowInfoModal] = useState(false);
   const [showDescriptionHelp, setShowDescriptionHelp] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
-  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [validationErrors, setValidationErrors] = useState<Record<string, string[]>>({});
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Validate with Zod
-    const result = projectSetupSchema.safeParse(projectInfo);
+    try {
+      // Validate with Zod schema
+      projectInfoSchema.parse(projectInfo);
 
-    if (!result.success) {
-      // Extract errors from Zod validation
-      const newErrors: Record<string, string> = {};
-      result.error.errors.forEach((err) => {
-        if (err.path[0]) {
-          newErrors[err.path[0] as string] = err.message;
-        }
-      });
-      setErrors(newErrors);
-      return;
+      // Clear errors and proceed
+      setValidationErrors({});
+      setShowSuccess(true);
+      setTimeout(() => {
+        setShowSuccess(false);
+        setCurrentStep('layout');
+      }, 1500);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        // Extract errors from Zod validation
+        const newErrors: Record<string, string[]> = {};
+        error.errors.forEach((err) => {
+          const path = err.path.join('.');
+          if (!newErrors[path]) {
+            newErrors[path] = [];
+          }
+          newErrors[path].push(err.message);
+        });
+        setValidationErrors(newErrors);
+      }
     }
-
-    // Clear errors and proceed
-    setErrors({});
-    setShowSuccess(true);
-    setTimeout(() => {
-      setShowSuccess(false);
-      setCurrentStep('layout');
-    }, 1500);
   };
 
   return (
@@ -64,7 +53,10 @@ const ProjectSetupStep: React.FC = () => {
           onClick={() => setShowInfoModal(true)}
           className="p-1.5 rounded-full bg-white/10 hover:bg-white/20 transition-colors group"
         >
-          <Info size={18} className="text-purple-400 group-hover:text-purple-300 transition-colors" />
+          <Info
+            size={18}
+            className="text-purple-400 group-hover:text-purple-300 transition-colors"
+          />
         </button>
       </div>
 
@@ -91,17 +83,28 @@ const ProjectSetupStep: React.FC = () => {
               w-full px-4 py-3 rounded-lg bg-white/5 border text-white placeholder-gray-400
               focus:ring-2 focus:ring-blue-500/50 focus:border-transparent
               transition-all duration-200
-              ${errors.name ? 'border-red-500/50' : 'border-white/20'}
+              ${validationErrors['name'] ? 'border-red-500/50' : 'border-white/20'}
             `}
             placeholder="e.g. The Photography Co"
           />
-          {errors.name && <p className="text-red-400 text-sm mt-1">{errors.name}</p>}
+          {validationErrors['name'] && (
+            <div className="mt-1 space-y-1">
+              {validationErrors['name'].map((error, index) => (
+                <p key={index} className="text-red-400 text-sm">
+                  {error}
+                </p>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* Project Description */}
         <div>
           <div className="flex items-center gap-2 mb-1">
-            <label htmlFor="project-description" className="block text-sm font-medium text-gray-300">
+            <label
+              htmlFor="project-description"
+              className="block text-sm font-medium text-gray-300"
+            >
               Project Description *
             </label>
             <button
@@ -109,7 +112,10 @@ const ProjectSetupStep: React.FC = () => {
               onClick={() => setShowDescriptionHelp(true)}
               className="p-1 rounded-full bg-white/10 hover:bg-white/20 transition-colors group"
             >
-              <Info size={16} className="text-purple-400 group-hover:text-purple-300 transition-colors" />
+              <Info
+                size={16}
+                className="text-purple-400 group-hover:text-purple-300 transition-colors"
+              />
             </button>
           </div>
           <textarea
@@ -121,15 +127,21 @@ const ProjectSetupStep: React.FC = () => {
               w-full px-4 py-3 rounded-lg bg-white/5 border text-white placeholder-gray-400
               focus:ring-2 focus:ring-blue-500/50 focus:border-transparent
               transition-all duration-200 resize-none
-              ${errors.description ? 'border-red-500/50' : 'border-white/20'}
+              ${validationErrors['description'] ? 'border-red-500/50' : 'border-white/20'}
             `}
             placeholder="A modern portfolio website to showcase my photography work and attract potential clients..."
           />
-          <div className="flex justify-between items-center mt-1">
-            {errors.description && <p className="text-red-400 text-sm">{errors.description}</p>}
-            <p className="text-gray-400 text-xs ml-auto">
-              {projectInfo.description.length}/500
-            </p>
+          <div className="flex justify-between items-start mt-1">
+            {validationErrors['description'] && (
+              <div className="space-y-1 flex-1">
+                {validationErrors['description'].map((error, index) => (
+                  <p key={index} className="text-red-400 text-sm">
+                    {error}
+                  </p>
+                ))}
+              </div>
+            )}
+            <p className="text-gray-400 text-xs ml-auto">{projectInfo.description.length}/500</p>
           </div>
         </div>
 
@@ -141,11 +153,15 @@ const ProjectSetupStep: React.FC = () => {
           <select
             id="project-type"
             value={projectInfo.type}
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             onChange={(e) => setProjectInfo({ ...projectInfo, type: e.target.value as any })}
-            className="w-full px-4 py-3 rounded-lg bg-white/5 border-white/20 text-white border
-                     focus:ring-2 focus:ring-blue-500/50 focus:border-transparent
-                     transition-all duration-200
-                     [&>option]:bg-gray-800 [&>option]:text-white"
+            className={`
+              w-full px-4 py-3 rounded-lg bg-white/5 border text-white
+              focus:ring-2 focus:ring-blue-500/50 focus:border-transparent
+              transition-all duration-200
+              [&>option]:bg-gray-800 [&>option]:text-white
+              ${validationErrors['type'] ? 'border-red-500/50' : 'border-white/20'}
+            `}
           >
             <option value="Website">Website</option>
             <option value="Web App">Web App</option>
@@ -154,6 +170,15 @@ const ProjectSetupStep: React.FC = () => {
             <option value="E-commerce">E-commerce</option>
             <option value="Portfolio">Portfolio</option>
           </select>
+          {validationErrors['type'] && (
+            <div className="mt-1 space-y-1">
+              {validationErrors['type'].map((error, index) => (
+                <p key={index} className="text-red-400 text-sm">
+                  {error}
+                </p>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* Purpose */}
@@ -165,10 +190,13 @@ const ProjectSetupStep: React.FC = () => {
             id="website-purpose"
             value={projectInfo.purpose}
             onChange={(e) => setProjectInfo({ ...projectInfo, purpose: e.target.value })}
-            className="w-full px-4 py-3 rounded-lg bg-white/5 border-white/20 text-white border
-                     focus:ring-2 focus:ring-blue-500/50 focus:border-transparent
-                     transition-all duration-200
-                     [&>option]:bg-gray-800 [&>option]:text-white"
+            className={`
+              w-full px-4 py-3 rounded-lg bg-white/5 border text-white
+              focus:ring-2 focus:ring-blue-500/50 focus:border-transparent
+              transition-all duration-200
+              [&>option]:bg-gray-800 [&>option]:text-white
+              ${validationErrors['purpose'] ? 'border-red-500/50' : 'border-white/20'}
+            `}
           >
             <option value="Portfolio">Portfolio</option>
             <option value="Business">Business</option>
@@ -181,6 +209,15 @@ const ProjectSetupStep: React.FC = () => {
             <option value="Events">Events</option>
             <option value="Non-profit">Non-profit</option>
           </select>
+          {validationErrors['purpose'] && (
+            <div className="mt-1 space-y-1">
+              {validationErrors['purpose'].map((error, index) => (
+                <p key={index} className="text-red-400 text-sm">
+                  {error}
+                </p>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* Target Audience (Optional) */}
@@ -202,15 +239,16 @@ const ProjectSetupStep: React.FC = () => {
 
         {/* Submit Button */}
         <div className="flex justify-end pt-4">
-          <Button type="submit">
-            Save & Continue
-          </Button>
+          <Button type="submit">Save & Continue</Button>
         </div>
       </form>
 
       {/* Modals */}
       <InfoModal isOpen={showInfoModal} onClose={() => setShowInfoModal(false)} />
-      <DescriptionHelpModal isOpen={showDescriptionHelp} onClose={() => setShowDescriptionHelp(false)} />
+      <DescriptionHelpModal
+        isOpen={showDescriptionHelp}
+        onClose={() => setShowDescriptionHelp(false)}
+      />
     </div>
   );
 };

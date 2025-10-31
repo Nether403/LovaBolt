@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useEffect, useRef, useState, Suspense, lazy } from 'react';
 import { ReactBitsComponent } from '../../types';
 
@@ -30,57 +32,97 @@ import '../../../react-bits/src/content/Animations/TargetCursor/TargetCursor.css
 // @ts-ignore - React-bits components are JSX without type definitions
 const animationComponents: Record<string, React.LazyExoticComponent<any>> = {
   // @ts-ignore
-  'animated-content': lazy(() => import('../../../react-bits/src/content/Animations/AnimatedContent/AnimatedContent')),
+  'animated-content': lazy(
+    () => import('../../../react-bits/src/content/Animations/AnimatedContent/AnimatedContent')
+  ),
   // @ts-ignore
-  'blob-cursor': lazy(() => import('../../../react-bits/src/content/Animations/BlobCursor/BlobCursor')),
+  'blob-cursor': lazy(
+    () => import('../../../react-bits/src/content/Animations/BlobCursor/BlobCursor')
+  ),
   // @ts-ignore
-  'click-spark': lazy(() => import('../../../react-bits/src/content/Animations/ClickSpark/ClickSpark')),
+  'click-spark': lazy(
+    () => import('../../../react-bits/src/content/Animations/ClickSpark/ClickSpark')
+  ),
   // @ts-ignore
   crosshair: lazy(() => import('../../../react-bits/src/content/Animations/Crosshair/Crosshair')),
   // @ts-ignore
   cubes: lazy(() => import('../../../react-bits/src/content/Animations/Cubes/Cubes')),
   // @ts-ignore
-  'electric-border': lazy(() => import('../../../react-bits/src/content/Animations/ElectricBorder/ElectricBorder')),
+  'electric-border': lazy(
+    () => import('../../../react-bits/src/content/Animations/ElectricBorder/ElectricBorder')
+  ),
   // @ts-ignore
-  'fade-content': lazy(() => import('../../../react-bits/src/content/Animations/FadeContent/FadeContent')),
+  'fade-content': lazy(
+    () => import('../../../react-bits/src/content/Animations/FadeContent/FadeContent')
+  ),
   // @ts-ignore
-  'ghost-cursor': lazy(() => import('../../../react-bits/src/content/Animations/GhostCursor/GhostCursor')),
+  'ghost-cursor': lazy(
+    () => import('../../../react-bits/src/content/Animations/GhostCursor/GhostCursor')
+  ),
   // @ts-ignore
-  'glare-hover': lazy(() => import('../../../react-bits/src/content/Animations/GlareHover/GlareHover')),
+  'glare-hover': lazy(
+    () => import('../../../react-bits/src/content/Animations/GlareHover/GlareHover')
+  ),
   // @ts-ignore
-  'gradual-blur': lazy(() => import('../../../react-bits/src/content/Animations/GradualBlur/GradualBlur')),
+  'gradual-blur': lazy(
+    () => import('../../../react-bits/src/content/Animations/GradualBlur/GradualBlur')
+  ),
   // @ts-ignore
-  'image-trail': lazy(() => import('../../../react-bits/src/content/Animations/ImageTrail/ImageTrail')),
+  'image-trail': lazy(
+    () => import('../../../react-bits/src/content/Animations/ImageTrail/ImageTrail')
+  ),
   // @ts-ignore
-  'laser-flow': lazy(() => import('../../../react-bits/src/content/Animations/LaserFlow/LaserFlow')),
+  'laser-flow': lazy(
+    () => import('../../../react-bits/src/content/Animations/LaserFlow/LaserFlow')
+  ),
   // @ts-ignore
   'logo-loop': lazy(() => import('../../../react-bits/src/content/Animations/LogoLoop/LogoLoop')),
   // @ts-ignore
   magnet: lazy(() => import('../../../react-bits/src/content/Animations/Magnet/Magnet')),
   // @ts-ignore
-  'magnet-lines': lazy(() => import('../../../react-bits/src/content/Animations/MagnetLines/MagnetLines')),
+  'magnet-lines': lazy(
+    () => import('../../../react-bits/src/content/Animations/MagnetLines/MagnetLines')
+  ),
   // @ts-ignore
-  'meta-balls': lazy(() => import('../../../react-bits/src/content/Animations/MetaBalls/MetaBalls')),
+  'meta-balls': lazy(
+    () => import('../../../react-bits/src/content/Animations/MetaBalls/MetaBalls')
+  ),
   // @ts-ignore
-  'metallic-paint': lazy(() => import('../../../react-bits/src/content/Animations/MetallicPaint/MetallicPaint')),
+  'metallic-paint': lazy(
+    () => import('../../../react-bits/src/content/Animations/MetallicPaint/MetallicPaint')
+  ),
   // @ts-ignore
   noise: lazy(() => import('../../../react-bits/src/content/Animations/Noise/Noise')),
   // @ts-ignore
-  'pixel-trail': lazy(() => import('../../../react-bits/src/content/Animations/PixelTrail/PixelTrail')),
+  'pixel-trail': lazy(
+    () => import('../../../react-bits/src/content/Animations/PixelTrail/PixelTrail')
+  ),
   // @ts-ignore
-  'pixel-transition': lazy(() => import('../../../react-bits/src/content/Animations/PixelTransition/PixelTransition')),
+  'pixel-transition': lazy(
+    () => import('../../../react-bits/src/content/Animations/PixelTransition/PixelTransition')
+  ),
   // @ts-ignore
   ribbons: lazy(() => import('../../../react-bits/src/content/Animations/Ribbons/Ribbons')),
   // @ts-ignore
-  'shape-blur': lazy(() => import('../../../react-bits/src/content/Animations/ShapeBlur/ShapeBlur')),
+  'shape-blur': lazy(
+    () => import('../../../react-bits/src/content/Animations/ShapeBlur/ShapeBlur')
+  ),
   // @ts-ignore
-  'splash-cursor': lazy(() => import('../../../react-bits/src/content/Animations/SplashCursor/SplashCursor')),
+  'splash-cursor': lazy(
+    () => import('../../../react-bits/src/content/Animations/SplashCursor/SplashCursor')
+  ),
   // @ts-ignore
-  'star-border': lazy(() => import('../../../react-bits/src/content/Animations/StarBorder/StarBorder')),
+  'star-border': lazy(
+    () => import('../../../react-bits/src/content/Animations/StarBorder/StarBorder')
+  ),
   // @ts-ignore
-  'sticker-peel': lazy(() => import('../../../react-bits/src/content/Animations/StickerPeel/StickerPeel')),
+  'sticker-peel': lazy(
+    () => import('../../../react-bits/src/content/Animations/StickerPeel/StickerPeel')
+  ),
   // @ts-ignore
-  'target-cursor': lazy(() => import('../../../react-bits/src/content/Animations/TargetCursor/TargetCursor')),
+  'target-cursor': lazy(
+    () => import('../../../react-bits/src/content/Animations/TargetCursor/TargetCursor')
+  ),
 };
 
 // Default props for each animation (optimized for small preview)
@@ -99,7 +141,9 @@ export const AnimationPreview: React.FC<AnimationPreviewProps> = ({ option }) =>
   useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => {
-        setIsVisible(entry.isIntersecting);
+        if (entry) {
+          setIsVisible(entry.isIntersecting);
+        }
       },
       {
         threshold: 0.1,
@@ -117,16 +161,15 @@ export const AnimationPreview: React.FC<AnimationPreviewProps> = ({ option }) =>
   }, []);
 
   const AnimationComponent = animationComponents[option.id];
-  const hasPreview = Boolean(AnimationComponent);
 
-  return (
-    <div
-      ref={containerRef}
-      className="w-full h-40 rounded-lg overflow-hidden bg-gray-900 relative"
-      aria-label={`Preview of ${option.title} animation`}
-    >
-      {!hasPreview ? (
-        // No preview available for this animation
+  // Type guard to ensure component is defined before rendering
+  if (!AnimationComponent) {
+    return (
+      <div
+        ref={containerRef}
+        className="w-full h-40 rounded-lg overflow-hidden bg-gray-900 relative"
+        aria-label={`Preview of ${option.title} animation`}
+      >
         <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-gray-800 to-gray-900">
           <div className="text-center p-4">
             <svg
@@ -145,7 +188,17 @@ export const AnimationPreview: React.FC<AnimationPreviewProps> = ({ option }) =>
             <div className="text-gray-500 text-xs">Preview not available</div>
           </div>
         </div>
-      ) : isVisible ? (
+      </div>
+    );
+  }
+
+  return (
+    <div
+      ref={containerRef}
+      className="w-full h-40 rounded-lg overflow-hidden bg-gray-900 relative"
+      aria-label={`Preview of ${option.title} animation`}
+    >
+      {isVisible ? (
         <Suspense
           fallback={
             <div className="w-full h-full flex items-center justify-center bg-gray-800">

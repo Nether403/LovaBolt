@@ -8,7 +8,7 @@ interface VideoPreviewProps {
 /**
  * VideoPreview renders a video preview from the react-bits video assets.
  * Uses Intersection Observer to only load videos when visible for performance.
- * 
+ *
  * Video files are located in react-bits/public/assets/video/
  * Each component has both .mp4 and .webm formats for browser compatibility.
  */
@@ -21,7 +21,9 @@ export const VideoPreview: React.FC<VideoPreviewProps> = ({ option }) => {
   useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => {
-        setIsVisible(entry.isIntersecting);
+        if (entry) {
+          setIsVisible(entry.isIntersecting);
+        }
       },
       {
         threshold: 0.1,
@@ -58,7 +60,7 @@ export const VideoPreview: React.FC<VideoPreviewProps> = ({ option }) => {
 
   // Convert component ID to video filename (remove hyphens, lowercase)
   const videoName = option.id.replace(/-/g, '').toLowerCase();
-  
+
   // Videos are copied to public/videos/ folder
   // Vite serves public folder at root, so we can reference them directly
   const webmUrl = `/videos/${videoName}.webm`;

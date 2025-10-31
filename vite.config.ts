@@ -22,12 +22,25 @@ export default defineConfig({
     exclude: ['lucide-react'],
   },
   build: {
+    // Disable sourcemaps in production for smaller bundle size
+    sourcemap: false,
+
+    // Use terser for minification with optimized settings
+    minify: 'terser',
+    terserOptions: {
+      compress: {
+        // Remove console.log statements in production
+        drop_console: true,
+        drop_debugger: true,
+      },
+    },
+
     rollupOptions: {
       output: {
         manualChunks: {
           // Core React libraries - stable, cacheable chunk
           'react-vendor': ['react', 'react-dom', 'react-router-dom'],
-          
+
           // Radix UI components - separate chunk for UI primitives
           'radix-ui': [
             '@radix-ui/react-accordion',
@@ -58,24 +71,31 @@ export default defineConfig({
             '@radix-ui/react-toggle-group',
             '@radix-ui/react-tooltip',
           ],
-          
+
           // 3D libraries - used by react-bits components
-          'three-vendor': ['three', '@react-three/fiber', '@react-three/drei', '@react-three/postprocessing', 'postprocessing'],
-          
+          'three-vendor': [
+            'three',
+            '@react-three/fiber',
+            '@react-three/drei',
+            '@react-three/postprocessing',
+            'postprocessing',
+          ],
+
           // Animation libraries - used by react-bits components
           'animation-vendor': ['gsap', 'motion'],
-          
+
           // React-Bits WebGL dependencies
           'react-bits-deps': ['ogl'],
-          
+
+          // Form libraries - ready for react-hook-form integration
+          'form-vendor': ['zod'], // Will include react-hook-form, @hookform/resolvers when added
+
           // Utility libraries
-          'utils': ['clsx', 'tailwind-merge', 'class-variance-authority'],
-          
-          // Validation library
-          'validation': ['zod'],
+          utils: ['clsx', 'tailwind-merge', 'class-variance-authority'],
         },
       },
     },
+
     // Increase chunk size warning limit for vendor chunks
     chunkSizeWarningLimit: 1000,
   },
