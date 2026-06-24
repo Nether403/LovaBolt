@@ -1,15 +1,15 @@
 import { useMemo } from 'react';
 import { useDebounce } from './useDebounce';
-import { useBoltBuilder } from '../contexts/BoltBuilderContext';
+import { useBoltBuilderStore } from '../stores/boltBuilderStore';
 import { CompatibilityResult, safeCheckCompatibility } from '../utils/compatibilityChecker';
 
 /**
  * Hook to check design compatibility with debouncing (200ms)
  * Prevents excessive compatibility checks during rapid selection changes
- * 
+ *
  * @param delay - Debounce delay in milliseconds (default: 200ms)
  * @returns Debounced compatibility result
- * 
+ *
  * @example
  * ```tsx
  * const compatibility = useDebouncedCompatibility(200);
@@ -23,17 +23,17 @@ export const useDebouncedCompatibility = (delay: number = 200): CompatibilityRes
     selectedFunctionality,
     backgroundSelection,
     selectedAnimations,
-  } = useBoltBuilder();
+  } = useBoltBuilderStore();
 
   // Create a stable key for debouncing based on selections
   const selectionsKey = useMemo(() => {
     return JSON.stringify({
       designStyle: selectedDesignStyle?.id,
       colorTheme: selectedColorTheme?.id,
-      components: selectedComponents?.map(c => c.id).join(','),
-      functionality: selectedFunctionality?.map(f => f.id).join(','),
+      components: selectedComponents?.map((c) => c.id).join(','),
+      functionality: selectedFunctionality?.map((f) => f.id).join(','),
       background: backgroundSelection?.id,
-      animations: selectedAnimations?.map(a => a.id).join(','),
+      animations: selectedAnimations?.map((a) => a.id).join(','),
     });
   }, [
     selectedDesignStyle,

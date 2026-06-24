@@ -1,7 +1,8 @@
 import React, { lazy, Suspense, useRef, useEffect, useMemo } from 'react';
-import { useBoltBuilder } from '../../contexts/BoltBuilderContext';
+import { useBoltBuilderStore } from '../../stores/boltBuilderStore';
 import { StepLoadingFallback } from '../ui/StepLoadingFallback';
 import { useKeyboardShortcuts, KeyboardShortcut } from '../../hooks/useKeyboardShortcuts';
+import { WIZARD_STEP_ORDER } from '../../data/wizardSteps';
 
 // Lazy load all wizard steps for code splitting
 const ProjectSetupStep = lazy(() => import('../steps/ProjectSetupStep'));
@@ -16,25 +17,24 @@ const FunctionalityStep = lazy(() => import('../steps/FunctionalityStep'));
 const AnimationsStep = lazy(() => import('../steps/AnimationsStep'));
 const PreviewStep = lazy(() => import('../steps/PreviewStep'));
 
+/**
+ * Canonical Advanced_Mode (wizard) step order. Re-exported from the neutral
+ * `data/wizardSteps` module so existing importers (parity test, task 24.2)
+ * keep working while the source of truth lives outside this UI component.
+ */
+export { WIZARD_STEP_ORDER } from '../../data/wizardSteps';
+
 const MainContent: React.FC = () => {
-  const { currentStep, setCurrentStep, generatePrompt, setPromptText, undo, redo } =
-    useBoltBuilder();
+  const currentStep = useBoltBuilderStore((s) => s.currentStep);
+  const setCurrentStep = useBoltBuilderStore((s) => s.setCurrentStep);
+  const generatePrompt = useBoltBuilderStore((s) => s.generatePrompt);
+  const setPromptText = useBoltBuilderStore((s) => s.setPromptText);
+  const undo = useBoltBuilderStore((s) => s.undo);
+  const redo = useBoltBuilderStore((s) => s.redo);
   const mainRef = useRef<HTMLDivElement>(null);
 
   // Define step order for navigation
-  const stepOrder = [
-    'project-setup',
-    'layout',
-    'design-style',
-    'color-theme',
-    'typography',
-    'visuals',
-    'background',
-    'components',
-    'functionality',
-    'animations',
-    'preview',
-  ];
+  const stepOrder = WIZARD_STEP_ORDER;
 
   // Navigation functions
   const navigateNext = React.useCallback(() => {

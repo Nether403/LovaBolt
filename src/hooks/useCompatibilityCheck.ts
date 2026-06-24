@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { useBoltBuilder } from '../contexts/BoltBuilderContext';
+import { useBoltBuilderStore } from '../stores/boltBuilderStore';
 import { CompatibilityResult, safeCheckCompatibility } from '../utils/compatibilityChecker';
 
 /**
@@ -14,7 +14,7 @@ export const useCompatibilityCheck = (): CompatibilityResult => {
     selectedFunctionality,
     backgroundSelection,
     selectedAnimations,
-  } = useBoltBuilder();
+  } = useBoltBuilderStore();
 
   // Memoize compatibility check to avoid unnecessary recalculations
   const compatibility = useMemo(() => {

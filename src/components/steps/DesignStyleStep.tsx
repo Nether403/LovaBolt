@@ -1,5 +1,5 @@
 import React from 'react';
-import { useBoltBuilder } from '../../contexts/BoltBuilderContext';
+import { useBoltBuilderStore } from '../../stores/boltBuilderStore';
 import { designStyles } from '../../data/wizardData';
 import { Button } from '../ui/button';
 import DesignStyleCard from '../cards/DesignStyleCard';
@@ -9,8 +9,8 @@ import type { DesignSuggestion } from '../../types/gemini';
 import { AIErrorFeedback } from '../ai/AIErrorFeedback';
 
 const DesignStyleStep: React.FC = () => {
-  const { selectedDesignStyle, setSelectedDesignStyle, setCurrentStep } = useBoltBuilder();
-  
+  const { selectedDesignStyle, setSelectedDesignStyle, setCurrentStep } = useBoltBuilderStore();
+
   // Design suggestions integration
   const {
     suggestions,
@@ -27,7 +27,7 @@ const DesignStyleStep: React.FC = () => {
   });
 
   const handleStyleSelect = (styleId: string) => {
-    const style = designStyles.find(s => s.id === styleId);
+    const style = designStyles.find((s) => s.id === styleId);
     setSelectedDesignStyle(style || null);
   };
 
@@ -36,7 +36,7 @@ const DesignStyleStep: React.FC = () => {
       setCurrentStep('color-theme');
     }
   };
-  
+
   // Handle applying auto-fixable suggestions
   const handleApplyFixes = (fixableSuggestions: DesignSuggestion[]) => {
     console.log('[DesignStyleStep] Applying fixes:', fixableSuggestions);
@@ -49,7 +49,9 @@ const DesignStyleStep: React.FC = () => {
       {/* Header */}
       <div>
         <h2 className="text-3xl font-bold mb-2 text-white">Choose Your Design Style</h2>
-        <p className="text-gray-300">Select a design aesthetic that matches your vision and brand personality.</p>
+        <p className="text-gray-300">
+          Select a design aesthetic that matches your vision and brand personality.
+        </p>
       </div>
 
       {/* Design Styles Grid */}
@@ -63,7 +65,7 @@ const DesignStyleStep: React.FC = () => {
           />
         ))}
       </div>
-      
+
       {/* AI Error Feedback */}
       {suggestionsError && (
         <AIErrorFeedback
@@ -72,26 +74,25 @@ const DesignStyleStep: React.FC = () => {
           isRetrying={suggestionsLoading}
         />
       )}
-      
+
       {/* AI Design Suggestions */}
-      {suggestionsVisible && (suggestions.length > 0 || suggestionsLoading) && !suggestionsError && (
-        <DesignSuggestions
-          suggestions={suggestions}
-          isLoading={suggestionsLoading}
-          onApplyFixes={handleApplyFixes}
-          onDismiss={hideSuggestions}
-        />
-      )}
+      {suggestionsVisible &&
+        (suggestions.length > 0 || suggestionsLoading) &&
+        !suggestionsError && (
+          <DesignSuggestions
+            suggestions={suggestions}
+            isLoading={suggestionsLoading}
+            onApplyFixes={handleApplyFixes}
+            onDismiss={hideSuggestions}
+          />
+        )}
 
       {/* Navigation */}
       <div className="flex justify-between pt-8">
-        <Button 
-          onClick={() => setCurrentStep('layout')}
-          variant="outline"
-        >
+        <Button onClick={() => setCurrentStep('layout')} variant="outline">
           Back to Layout
         </Button>
-        
+
         <div className="flex gap-2">
           {suggestions.length > 0 && !suggestionsVisible && (
             <Button
@@ -102,8 +103,8 @@ const DesignStyleStep: React.FC = () => {
               View {suggestions.length} Suggestion{suggestions.length !== 1 ? 's' : ''}
             </Button>
           )}
-          
-          <Button 
+
+          <Button
             onClick={handleContinue}
             disabled={!selectedDesignStyle}
             className={selectedDesignStyle ? 'bg-teal-600 hover:bg-teal-700 text-white' : ''}

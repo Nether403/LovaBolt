@@ -13,7 +13,7 @@ import {
   Redo2,
   RotateCcw,
 } from 'lucide-react';
-import { useBoltBuilder } from '../../contexts/BoltBuilderContext';
+import { useBoltBuilderStore } from '../../stores/boltBuilderStore';
 import { CompatibilityIndicator } from '../ai/CompatibilityIndicator';
 import { useCompatibilityCheck } from '../../hooks/useCompatibilityCheck';
 import { ResetConfirmationModal } from '../modals/ResetConfirmationModal';
@@ -24,7 +24,15 @@ interface SidebarProps {
 }
 
 const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
-  const { currentStep, setCurrentStep, canUndo, canRedo, undo, redo, clearProject } = useBoltBuilder();
+  const {
+    currentStep,
+    setCurrentStep,
+    canUndo,
+    canRedo,
+    undo,
+    redo,
+    clearProjectState: clearProject,
+  } = useBoltBuilderStore();
   const compatibility = useCompatibilityCheck();
   const [isResetModalOpen, setIsResetModalOpen] = useState(false);
 

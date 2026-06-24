@@ -84,6 +84,49 @@ Object.defineProperty(navigator, 'clipboard', {
   },
 });
 
+// jsdom does not implement Element.scrollTo / window.scrollTo. Stub them
+// as no-ops so components that call scrollTo in effects (e.g. MainContent.tsx
+// scrolling to top on step change) don't throw during tests.
+if (!('scrollTo' in Element.prototype)) {
+  Object.defineProperty(Element.prototype, 'scrollTo', {
+    configurable: true,
+    writable: true,
+    value: vi.fn(),
+  });
+}
+if (typeof window.scrollTo !== 'function') {
+  window.scrollTo = vi.fn() as unknown as typeof window.scrollTo;
+}
+
+// jsdom does not implement IntersectionObserver. Components that lazy-load
+// content based on viewport visibility (e.g. VideoPreview inside ReactBitsCard)
+// need it at mount. A minimal stub is sufficient — `observe` is called once
+// but the callback never needs to fire under unit-test conditions.
+class IntersectionObserverMock {
+  readonly root: Element | Document | null = null;
+  readonly rootMargin: string = '';
+  readonly thresholds: ReadonlyArray<number> = [];
+  observe = vi.fn();
+  unobserve = vi.fn();
+  disconnect = vi.fn();
+  takeRecords = vi.fn().mockReturnValue([]);
+  constructor(_callback: IntersectionObserverCallback, _options?: IntersectionObserverInit) {
+    /* no-op */
+  }
+}
+
+Object.defineProperty(window, 'IntersectionObserver', {
+  writable: true,
+  configurable: true,
+  value: IntersectionObserverMock,
+});
+
+Object.defineProperty(globalThis, 'IntersectionObserver', {
+  writable: true,
+  configurable: true,
+  value: IntersectionObserverMock,
+});
+
 window.requestAnimationFrame = vi.fn((callback: FrameRequestCallback) => {
   return window.setTimeout(() => callback(performance.now()), 16);
 });

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useBoltBuilder } from '../contexts/BoltBuilderContext';
+import { useBoltBuilderStore } from '../stores/boltBuilderStore';
 import Header from './layout/Header';
 import Sidebar from './layout/Sidebar';
 import MainContent from './layout/MainContent';
@@ -8,7 +8,14 @@ import Footer from './layout/Footer';
 import PromptModal from './modals/PromptModal';
 
 const WizardLayout: React.FC = () => {
-  const { generatePrompt, generateBasicPrompt, setPromptText, setPromptType, promptText, promptType } = useBoltBuilder();
+  const {
+    generatePrompt,
+    generateBasicPrompt,
+    setPromptText,
+    setPromptType,
+    promptText,
+    promptType,
+  } = useBoltBuilderStore();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   const [isPromptModalOpen, setIsPromptModalOpen] = useState(false);
@@ -26,28 +33,22 @@ const WizardLayout: React.FC = () => {
 
   return (
     <div className="flex flex-col h-screen relative z-10">
-      <Header 
+      <Header
         onGeneratePrompt={handleGeneratePrompt}
         onToggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)}
         onTogglePreview={() => setIsPreviewOpen(!isPreviewOpen)}
       />
-      
+
       <div className="flex flex-1 overflow-hidden">
-        <Sidebar 
-          isOpen={isSidebarOpen} 
-          onClose={() => setIsSidebarOpen(false)} 
-        />
-        
+        <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
+
         <MainContent />
-        
-        <PreviewPanel 
-          isOpen={isPreviewOpen} 
-          onClose={() => setIsPreviewOpen(false)} 
-        />
+
+        <PreviewPanel isOpen={isPreviewOpen} onClose={() => setIsPreviewOpen(false)} />
       </div>
-      
+
       <Footer />
-      
+
       <PromptModal
         isOpen={isPromptModalOpen}
         onClose={() => setIsPromptModalOpen(false)}

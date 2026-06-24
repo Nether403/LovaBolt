@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { useBoltBuilder } from '../../contexts/BoltBuilderContext';
+import { useBoltBuilderStore } from '../../stores/boltBuilderStore';
 import { backgroundOptions as reactBitsBackgrounds } from '../../data/react-bits';
 import { backgroundPatterns } from '../../data/wizardData';
 import { BackgroundOption, BackgroundSelection } from '../../types';
@@ -22,7 +22,8 @@ const BACKGROUND_TAGS = Array.from(
 ).sort();
 
 const BackgroundStepContent: React.FC = () => {
-  const { backgroundSelection, setBackgroundSelection, setCurrentStep, selectedColorTheme } = useBoltBuilder();
+  const { backgroundSelection, setBackgroundSelection, setCurrentStep, selectedColorTheme } =
+    useBoltBuilderStore();
   const [backgroundType, setBackgroundType] = useState<
     'solid' | 'gradient' | 'pattern' | 'react-bits'
   >(backgroundSelection?.type || 'solid');

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useBoltBuilder } from '../../contexts/BoltBuilderContext';
+import { useBoltBuilderStore } from '../../stores/boltBuilderStore';
 import { Button } from '../ui/button';
 import PromptModal from '../modals/PromptModal';
 import { PromptQualityScore } from '../ai/PromptQualityScore';
@@ -41,7 +41,7 @@ const PreviewStep: React.FC = () => {
     setPromptType,
     promptText,
     promptType,
-  } = useBoltBuilder();
+  } = useBoltBuilderStore();
 
   const [isPromptModalOpen, setIsPromptModalOpen] = useState(false);
   const [promptAnalysis, setPromptAnalysis] = useState<PromptAnalysisResult | null>(null);
@@ -49,12 +49,12 @@ const PreviewStep: React.FC = () => {
   const [showPromptFeedback, setShowPromptFeedback] = useState(false);
   const [showEnhancement, setShowEnhancement] = useState(false);
   const [enhancement, setEnhancement] = useState<PromptEnhancementType | null>(null);
-  
+
   const { enhancePrompt, isEnhancing, enhancementError } = useEnhancePrompt();
 
   const generatePromptType = (type: 'basic' | 'detailed') => {
     let prompt: string;
-    
+
     if (type === 'basic') {
       prompt = generateBasicPrompt();
     } else {
@@ -76,7 +76,7 @@ const PreviewStep: React.FC = () => {
           selectedComponents,
           selectedAnimations,
         };
-        
+
         // Render template with current state
         prompt = renderTemplate({
           template: selectedTemplate,
@@ -84,10 +84,10 @@ const PreviewStep: React.FC = () => {
         });
       }
     }
-    
+
     setPromptText(prompt);
     setPromptType(type);
-    
+
     // Analyze the generated prompt
     const analysis = analyzePrompt({
       prompt,
@@ -98,7 +98,7 @@ const PreviewStep: React.FC = () => {
       selectedAnimations,
     });
     setPromptAnalysis(analysis);
-    
+
     // Track analytics event
     trackAIEvent('prompt_analyzed', {
       promptType: type,
@@ -108,7 +108,7 @@ const PreviewStep: React.FC = () => {
       weaknessesCount: analysis.weaknesses.length,
       templateId: selectedTemplate.id,
     });
-    
+
     // Show feedback prompt after a short delay
     setTimeout(() => {
       setShowPromptFeedback(true);
@@ -122,7 +122,7 @@ const PreviewStep: React.FC = () => {
 
   const handleTemplateSelect = (template: PromptTemplate) => {
     setSelectedTemplate(template);
-    
+
     // If prompt is already generated, regenerate with new template
     if (promptText && promptType === 'detailed') {
       generatePromptType('detailed');
@@ -145,12 +145,12 @@ const PreviewStep: React.FC = () => {
 
       // Call AI enhancement
       const result = await enhancePrompt(promptText);
-      
+
       // Check if enhancement actually added anything
       if (result.improvements.length > 0) {
         setEnhancement(result);
         setShowEnhancement(true);
-        
+
         // Track success
         trackAIEvent('prompt_enhancement_completed', {
           improvementsCount: result.improvements.length,
@@ -162,7 +162,7 @@ const PreviewStep: React.FC = () => {
       }
     } catch (error) {
       console.error('Failed to enhance prompt:', error);
-      
+
       // Track error
       trackAIEvent('prompt_enhancement_failed', {
         error: error instanceof Error ? error.message : 'Unknown error',
@@ -174,7 +174,7 @@ const PreviewStep: React.FC = () => {
     if (enhancement) {
       setPromptText(enhancement.enhancedPrompt);
       setShowEnhancement(false);
-      
+
       // Re-analyze the enhanced prompt
       const analysis = analyzePrompt({
         prompt: enhancement.enhancedPrompt,
@@ -185,7 +185,7 @@ const PreviewStep: React.FC = () => {
         selectedAnimations,
       });
       setPromptAnalysis(analysis);
-      
+
       // Track acceptance
       trackAIEvent('prompt_enhancement_accepted', {
         improvementsCount: enhancement.improvements.length,
@@ -195,7 +195,7 @@ const PreviewStep: React.FC = () => {
 
   const handleRejectEnhancement = () => {
     setShowEnhancement(false);
-    
+
     // Track rejection
     if (enhancement) {
       trackAIEvent('prompt_enhancement_rejected', {
@@ -207,7 +207,7 @@ const PreviewStep: React.FC = () => {
   const handleEditEnhancement = (editedPrompt: string) => {
     setPromptText(editedPrompt);
     setShowEnhancement(false);
-    
+
     // Re-analyze the edited prompt
     const analysis = analyzePrompt({
       prompt: editedPrompt,
@@ -218,7 +218,7 @@ const PreviewStep: React.FC = () => {
       selectedAnimations,
     });
     setPromptAnalysis(analysis);
-    
+
     // Track edit
     if (enhancement) {
       trackAIEvent('prompt_enhancement_edited', {
@@ -241,18 +241,25 @@ const PreviewStep: React.FC = () => {
       });
       setPromptAnalysis(analysis);
     }
-  }, [promptText, projectInfo, selectedDesignStyle, selectedColorTheme, selectedComponents, selectedAnimations]);
+  }, [
+    promptText,
+    projectInfo,
+    selectedDesignStyle,
+    selectedColorTheme,
+    selectedComponents,
+    selectedAnimations,
+  ]);
 
   const handleApplyFixes = () => {
     if (promptAnalysis?.optimizedPrompt) {
       setPromptText(promptAnalysis.optimizedPrompt);
-      
+
       // Track analytics event
       trackAIEvent('prompt_fixes_applied', {
         originalScore: promptAnalysis.score,
-        fixesApplied: promptAnalysis.suggestions.filter(s => s.autoFixable).length,
+        fixesApplied: promptAnalysis.suggestions.filter((s) => s.autoFixable).length,
       });
-      
+
       // Re-analyze the optimized prompt
       const newAnalysis = analyzePrompt({
         prompt: promptAnalysis.optimizedPrompt,
@@ -416,14 +423,19 @@ const PreviewStep: React.FC = () => {
           <h3 className="font-bold text-lg mb-3 text-white">Background Effect</h3>
           {backgroundSelection ? (
             <div>
-              {backgroundSelection.type === 'react-bits' && backgroundSelection.reactBitsComponent ? (
+              {backgroundSelection.type === 'react-bits' &&
+              backgroundSelection.reactBitsComponent ? (
                 <>
-                  <p className="text-white font-semibold mb-2">{backgroundSelection.reactBitsComponent.title}</p>
-                  <p className="text-gray-300 text-sm mb-3">{backgroundSelection.reactBitsComponent.description}</p>
+                  <p className="text-white font-semibold mb-2">
+                    {backgroundSelection.reactBitsComponent.title}
+                  </p>
+                  <p className="text-gray-300 text-sm mb-3">
+                    {backgroundSelection.reactBitsComponent.description}
+                  </p>
                   {backgroundSelection.reactBitsComponent.previewUrl && (
                     <div className="relative h-24 rounded-lg overflow-hidden border border-white/10">
-                      <img 
-                        src={backgroundSelection.reactBitsComponent.previewUrl} 
+                      <img
+                        src={backgroundSelection.reactBitsComponent.previewUrl}
                         alt={`${backgroundSelection.reactBitsComponent.title} preview`}
                         className="w-full h-full object-cover"
                       />
@@ -432,12 +444,22 @@ const PreviewStep: React.FC = () => {
                 </>
               ) : (
                 <div className="space-y-2">
-                  <p className="text-white font-semibold capitalize">{backgroundSelection.type} Background</p>
+                  <p className="text-white font-semibold capitalize">
+                    {backgroundSelection.type} Background
+                  </p>
                   {backgroundSelection.type === 'solid' && (
-                    <div className="w-full h-24 rounded-lg ring-1 ring-white/20" style={{ backgroundColor: backgroundSelection.solidColor }} />
+                    <div
+                      className="w-full h-24 rounded-lg ring-1 ring-white/20"
+                      style={{ backgroundColor: backgroundSelection.solidColor }}
+                    />
                   )}
                   {backgroundSelection.type === 'gradient' && (
-                    <div className="w-full h-24 rounded-lg ring-1 ring-white/20" style={{ background: `linear-gradient(${backgroundSelection.gradientDirection}, ${backgroundSelection.gradientColors?.join(', ')})` }} />
+                    <div
+                      className="w-full h-24 rounded-lg ring-1 ring-white/20"
+                      style={{
+                        background: `linear-gradient(${backgroundSelection.gradientDirection}, ${backgroundSelection.gradientColors?.join(', ')})`,
+                      }}
+                    />
                   )}
                 </div>
               )}
@@ -558,7 +580,7 @@ const PreviewStep: React.FC = () => {
           />
         </div>
       )}
-      
+
       {/* Prompt Enhancement Display */}
       {showEnhancement && enhancement && !enhancementError && (
         <div className="mt-8">
@@ -575,10 +597,7 @@ const PreviewStep: React.FC = () => {
       {/* Prompt Quality Analysis */}
       {promptAnalysis && !showEnhancement && (
         <div className="mt-8">
-          <PromptQualityScore
-            analysis={promptAnalysis}
-            onApplyFixes={handleApplyFixes}
-          />
+          <PromptQualityScore analysis={promptAnalysis} onApplyFixes={handleApplyFixes} />
         </div>
       )}
 

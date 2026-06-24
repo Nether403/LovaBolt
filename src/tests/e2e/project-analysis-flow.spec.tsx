@@ -1,6 +1,6 @@
 /**
  * E2E Test: Project Analysis Flow
- * 
+ *
  * Tests the complete user journey from project description to AI suggestions
  * Requirements: 1.1, 1.2, 1.4, 1.5, 3.3
  */
@@ -8,8 +8,8 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
-import { BoltBuilderProvider } from '../../contexts/BoltBuilderContext';
 import ProjectSetupStep from '../../components/steps/ProjectSetupStep';
+import { useBoltBuilderStore } from '../../stores/boltBuilderStore';
 import React from 'react';
 
 // Mock environment variables
@@ -19,15 +19,15 @@ describe('E2E: Project Analysis Flow', () => {
   beforeEach(() => {
     // Clear localStorage before each test
     localStorage.clear();
+    // Reset Zustand store to a pristine state so each test starts clean
+    useBoltBuilderStore.getState().clearProjectState();
     vi.clearAllMocks();
   });
 
   const renderProjectSetup = () => {
     return render(
       <BrowserRouter>
-        <BoltBuilderProvider>
-          <ProjectSetupStep />
-        </BoltBuilderProvider>
+        <ProjectSetupStep />
       </BrowserRouter>
     );
   };
@@ -43,7 +43,7 @@ describe('E2E: Project Analysis Flow', () => {
       // Step 2: User enters project description (>20 characters)
       const descriptionInput = screen.getByLabelText(/project description/i);
       fireEvent.change(descriptionInput, {
-        target: { value: 'I want to build a portfolio to showcase my design work and projects' }
+        target: { value: 'I want to build a portfolio to showcase my design work and projects' },
       });
 
       // Step 3: Wait for AI analysis to complete (or fallback)
@@ -85,7 +85,7 @@ describe('E2E: Project Analysis Flow', () => {
       // Enter project description
       const descriptionInput = screen.getByLabelText(/project description/i);
       fireEvent.change(descriptionInput, {
-        target: { value: 'Build a blog platform for writers and content creators' }
+        target: { value: 'Build a blog platform for writers and content creators' },
       });
 
       // Wait for fallback to complete
@@ -111,7 +111,7 @@ describe('E2E: Project Analysis Flow', () => {
 
       const descriptionInput = screen.getByLabelText(/project description/i);
       fireEvent.change(descriptionInput, {
-        target: { value: 'A comprehensive test of the fallback system functionality' }
+        target: { value: 'A comprehensive test of the fallback system functionality' },
       });
 
       // Wait for any processing
@@ -158,7 +158,7 @@ describe('E2E: Project Analysis Flow', () => {
       // Enter description
       const descriptionInput = screen.getByLabelText(/project description/i);
       fireEvent.change(descriptionInput, {
-        target: { value: 'Create an educational platform for online courses' }
+        target: { value: 'Create an educational platform for online courses' },
       });
 
       // UI should remain responsive
@@ -167,9 +167,7 @@ describe('E2E: Project Analysis Flow', () => {
 
       // Both inputs should work
       expect(projectNameInput).toHaveValue('EduPlatform');
-      expect(descriptionInput).toHaveValue(
-        'Create an educational platform for online courses'
-      );
+      expect(descriptionInput).toHaveValue('Create an educational platform for online courses');
     });
   });
 });

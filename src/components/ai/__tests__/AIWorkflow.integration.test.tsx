@@ -1,12 +1,12 @@
 /**
  * Complete AI Workflow Integration Tests
- * 
+ *
  * Tests the end-to-end AI workflow including:
  * - Design suggestions flow from analysis to application
  * - Prompt enhancement flow from generation to acceptance
  * - Integration between suggestions and prompt enhancement
  * - Complete user journey through AI features
- * 
+ *
  * Requirements: 4.1, 4.4, 5.1, 5.5
  */
 
@@ -15,7 +15,7 @@ import { renderHook, act } from '@testing-library/react';
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { useGemini } from '../../../hooks/useGemini';
 import { useDesignSuggestions } from '../../../hooks/useDesignSuggestions';
-import type { BoltBuilderState } from '../../../contexts/BoltBuilderContext';
+import type { BoltBuilderState } from '../../../types';
 
 // Mock environment variables
 vi.stubEnv('VITE_GEMINI_API_KEY', 'AIzaSyC_test_key_1234567890123456789012345');
@@ -51,17 +51,15 @@ const mockWizardState: Partial<BoltBuilderState> = {
     { id: 'carousel', title: 'Carousel', description: 'Image carousel' },
     { id: 'accordion', title: 'Accordion', description: 'Collapsible sections' },
   ],
-  selectedAnimations: [
-    { id: 'fade', title: 'Fade In', description: 'Fade in animation' },
-  ],
+  selectedAnimations: [{ id: 'fade', title: 'Fade In', description: 'Fade in animation' }],
   selectedFunctionality: [
     { id: 'auth', title: 'Authentication', description: 'User authentication' },
   ],
 };
 
-// Mock BoltBuilderContext
-vi.mock('../../../contexts/BoltBuilderContext', () => ({
-  useBoltBuilder: vi.fn(() => mockWizardState),
+// Mock the Zustand store so hooks under test see the fixed wizard state
+vi.mock('../../../stores/boltBuilderStore', () => ({
+  useBoltBuilderStore: vi.fn(() => mockWizardState),
 }));
 
 describe('Complete AI Workflow Integration Tests', () => {
@@ -73,9 +71,11 @@ describe('Complete AI Workflow Integration Tests', () => {
   describe('End-to-End Suggestions Flow (Requirements 4.1, 4.4)', () => {
     it('should complete full suggestion workflow', async () => {
       const { result: geminiResult } = renderHook(() => useGemini());
-      const { result: suggestionsResult } = renderHook(() => useDesignSuggestions({
-        autoAnalyze: false,
-      }));
+      const { result: suggestionsResult } = renderHook(() =>
+        useDesignSuggestions({
+          autoAnalyze: false,
+        })
+      );
 
       // Step 1: User makes design selections (mocked in state)
       expect(mockWizardState.selectedDesignStyle).toBeDefined();
@@ -122,10 +122,10 @@ describe('Complete AI Workflow Integration Tests', () => {
       });
 
       // Filter auto-fixable suggestions
-      const autoFixable = result.current.suggestions.filter(s => s.autoFixable);
+      const autoFixable = result.current.suggestions.filter((s) => s.autoFixable);
 
       // Verify auto-fixable suggestions have all required data
-      autoFixable.forEach(suggestion => {
+      autoFixable.forEach((suggestion) => {
         expect(suggestion.message).toBeTruthy();
         expect(suggestion.reasoning).toBeTruthy();
         expect(suggestion.type).toBeTruthy();
@@ -239,8 +239,8 @@ Build a portfolio website
       });
 
       // Step 2: Apply auto-fixes (simulated)
-      const autoFixable = suggestionsResult.current.suggestions.filter(s => s.autoFixable);
-      
+      const autoFixable = suggestionsResult.current.suggestions.filter((s) => s.autoFixable);
+
       // In real app, these would update wizard state
       // Here we just verify the workflow is possible
 

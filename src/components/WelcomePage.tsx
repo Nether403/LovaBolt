@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Wand2 } from 'lucide-react';
+import { AccountControl } from './auth/AccountControl';
 
 const WelcomePage: React.FC = () => {
   const navigate = useNavigate();
@@ -54,12 +55,15 @@ const WelcomePage: React.FC = () => {
 
   return (
     <div className="relative min-h-screen flex flex-col items-center justify-center px-4 text-center">
+      {/* Top-right account affordance (sign in / account menu) */}
+      <div className="absolute top-4 right-4 z-20">
+        <AccountControl />
+      </div>
+
       {/* Logo and Branding */}
       <div className="mb-8 animate-slide-up">
         <div className="mb-6 flex justify-center">
-          <Wand2
-            className="w-48 h-48 mx-auto text-blue-500 rotate-12 transform-gpu hover:rotate-45 transition-transform duration-500 drop-shadow-[0_0_20px_rgba(59,130,246,0.6)]"
-          />
+          <Wand2 className="w-48 h-48 mx-auto text-blue-500 rotate-12 transform-gpu hover:rotate-45 transition-transform duration-500 drop-shadow-[0_0_20px_rgba(59,130,246,0.6)]" />
         </div>
         <div className="mb-4">
           <h1 className="text-6xl font-extrabold text-transparent bg-clip-text bg-linear-to-r from-blue-400 to-purple-600 mx-auto max-w-2xl drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">

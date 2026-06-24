@@ -1,7 +1,12 @@
 /**
  * AI Components Index
- * 
- * Central export point for all AI-related components
+ *
+ * Central export point for all AI-related components.
+ *
+ * NOTE: Premium/upgrade/analytics-dashboard client-side surfaces were removed
+ * as part of Starter Kit Forge Phase 0 (Requirements 0.2.1, 0.2.2, 0.2.4).
+ * Server-side telemetry services (analyticsService, costTracker,
+ * feedbackService, metricsService) are retained per Requirement 0.2.2.
  */
 
 // Existing components
@@ -11,17 +16,9 @@ export { DesignSuggestions } from './DesignSuggestions';
 export { PromptEnhancement } from './PromptEnhancement';
 export { ChatInterface } from './ChatInterface';
 
-// Premium tier components (Task 17)
-export { UpgradePrompt } from './UpgradePrompt';
-export { UpgradeModal } from './UpgradeModal';
-export { UpgradeManager } from './UpgradeManager';
-export { PremiumComparison } from './PremiumComparison';
+// Conversation export (Task 17 residual – not a premium/upgrade surface)
 export { ConversationExport } from './ConversationExport';
 
-// Feedback components (Task 18)
+// Feedback components (Task 18) – kept: these collect feedback, they are not dashboards
 export { FeedbackButtons } from './FeedbackButtons';
-export { FeedbackAnalytics } from './FeedbackAnalytics';
 export { PromptOptimizationPanel } from './PromptOptimizationPanel';
-
-// Analytics components (Task 19)
-export { ComprehensiveAnalyticsDashboard } from './ComprehensiveAnalyticsDashboard';

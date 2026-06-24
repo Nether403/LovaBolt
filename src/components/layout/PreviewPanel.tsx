@@ -1,6 +1,6 @@
 import React from 'react';
 import { X } from 'lucide-react';
-import { useBoltBuilder } from '../../contexts/BoltBuilderContext';
+import { useBoltBuilderStore } from '../../stores/boltBuilderStore';
 
 interface PreviewPanelProps {
   isOpen: boolean;
@@ -8,6 +8,7 @@ interface PreviewPanelProps {
 }
 
 const PreviewPanel: React.FC<PreviewPanelProps> = ({ isOpen, onClose }) => {
+  const store = useBoltBuilderStore();
   const {
     projectInfo,
     selectedLayout,
@@ -16,11 +17,10 @@ const PreviewPanel: React.FC<PreviewPanelProps> = ({ isOpen, onClose }) => {
     selectedTypography,
     selectedVisuals,
     selectedFunctionality,
-    selectedAnimations
-  } = useBoltBuilder();
+    selectedAnimations,
+  } = store;
 
   const getLayoutIcon = () => {
-    
     switch (selectedLayout?.title) {
       case 'Single Column':
         return (
@@ -115,33 +115,26 @@ const PreviewPanel: React.FC<PreviewPanelProps> = ({ isOpen, onClose }) => {
     <>
       {/* Mobile Overlay */}
       {isOpen && (
-        <div 
-          className="fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden"
-          onClick={onClose}
-        />
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden" onClick={onClose} />
       )}
-      
+
       {/* Preview Panel */}
-      <aside className={`
+      <aside
+        className={`
         bg-black bg-opacity-90 backdrop-blur-lg w-80 p-4 overflow-y-auto 
         transition-all duration-300 ease-in-out relative
-        ${isOpen 
-          ? 'fixed inset-y-0 right-0 z-50 md:relative md:z-0' 
-          : 'hidden md:block'
-        }
-      `}>
+        ${isOpen ? 'fixed inset-y-0 right-0 z-50 md:relative md:z-0' : 'hidden md:block'}
+      `}
+      >
         {/* Background Effects */}
         <div className="absolute inset-0 bg-linear-to-b from-blue-900/20 to-transparent pointer-events-none" />
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(59,130,246,0.2)_0%,transparent_70%)] pointer-events-none" />
-        
+
         <div className="relative z-10">
           {/* Mobile Header */}
           <div className="flex justify-between items-center mb-4 md:hidden">
             <h2 className="font-bold text-xl text-white">Preview</h2>
-            <button 
-              className="text-white hover:text-white/80 transition-colors"
-              onClick={onClose}
-            >
+            <button className="text-white hover:text-white/80 transition-colors" onClick={onClose}>
               <X size={24} />
             </button>
           </div>
@@ -156,7 +149,9 @@ const PreviewPanel: React.FC<PreviewPanelProps> = ({ isOpen, onClose }) => {
                   <p className="font-semibold text-white">{projectInfo.name}</p>
                   <p className="text-sm text-gray-300 mt-1">{projectInfo.purpose}</p>
                   {projectInfo.description && (
-                    <p className="text-xs text-gray-400 mt-2 line-clamp-2">{projectInfo.description}</p>
+                    <p className="text-xs text-gray-400 mt-2 line-clamp-2">
+                      {projectInfo.description}
+                    </p>
                   )}
                 </>
               ) : (
@@ -182,7 +177,9 @@ const PreviewPanel: React.FC<PreviewPanelProps> = ({ isOpen, onClose }) => {
               <h3 className="font-bold text-lg mb-3 text-white">Design Style</h3>
               {selectedDesignStyle ? (
                 <div>
-                  <h4 className="text-lg font-semibold mb-3 text-white">{selectedDesignStyle.title}</h4>
+                  <h4 className="text-lg font-semibold mb-3 text-white">
+                    {selectedDesignStyle.title}
+                  </h4>
                   <div className="h-20">
                     <div className="w-full h-full overflow-hidden rounded-lg bg-black/20 backdrop-blur-sm p-2">
                       {renderDesignPreview(selectedDesignStyle.id)}
@@ -199,7 +196,9 @@ const PreviewPanel: React.FC<PreviewPanelProps> = ({ isOpen, onClose }) => {
               <h3 className="font-bold text-lg mb-3 text-white">Color Theme</h3>
               {selectedColorTheme ? (
                 <div>
-                  <h4 className="text-lg font-semibold mb-3 text-white">{selectedColorTheme.title}</h4>
+                  <h4 className="text-lg font-semibold mb-3 text-white">
+                    {selectedColorTheme.title}
+                  </h4>
                   <div className="flex gap-2">
                     {selectedColorTheme.colors.map((color, index) => (
                       <div
@@ -218,13 +217,17 @@ const PreviewPanel: React.FC<PreviewPanelProps> = ({ isOpen, onClose }) => {
             {/* Typography Preview */}
             <div className="glass-card rounded-lg shadow p-4">
               <h3 className="font-bold text-lg mb-3 text-white">Typography</h3>
-              <div 
+              <div
                 className="p-3 bg-white/5 backdrop-blur-sm rounded-lg border border-white/10"
                 style={{
-                  fontWeight: selectedTypography.headingWeight === 'Bold' ? 'bold' : 
-                             selectedTypography.headingWeight === 'Light' ? '300' : 'normal',
+                  fontWeight:
+                    selectedTypography.headingWeight === 'Bold'
+                      ? 'bold'
+                      : selectedTypography.headingWeight === 'Light'
+                        ? '300'
+                        : 'normal',
                   textAlign: selectedTypography.textAlignment.toLowerCase() as any,
-                  fontFamily: selectedTypography.fontFamily
+                  fontFamily: selectedTypography.fontFamily,
                 }}
               >
                 <p className="text-xl mb-1 text-white">Sample Text</p>
@@ -246,9 +249,7 @@ const PreviewPanel: React.FC<PreviewPanelProps> = ({ isOpen, onClose }) => {
                     </div>
                   ))}
                   {selectedVisuals.length > 3 && (
-                    <p className="text-sm text-gray-400">
-                      +{selectedVisuals.length - 3} more...
-                    </p>
+                    <p className="text-sm text-gray-400">+{selectedVisuals.length - 3} more...</p>
                   )}
                 </div>
               ) : (

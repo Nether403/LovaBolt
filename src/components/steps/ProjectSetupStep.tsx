@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Info, Sparkles, CheckCircle, Loader2, AlertCircle } from 'lucide-react';
-import { useBoltBuilder } from '../../contexts/BoltBuilderContext';
+import { useBoltBuilderStore } from '../../stores/boltBuilderStore';
 import { Button } from '../ui/button';
 import InfoModal from '../modals/InfoModal';
 import DescriptionHelpModal from '../modals/DescriptionHelpModal';
@@ -45,7 +45,7 @@ const ProjectSetupStep: React.FC = () => {
     setSelectedComponents,
     selectedAnimations,
     setSelectedAnimations,
-  } = useBoltBuilder();
+  } = useBoltBuilderStore();
   const [showInfoModal, setShowInfoModal] = useState(false);
   const [showDescriptionHelp, setShowDescriptionHelp] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
@@ -60,12 +60,7 @@ const ProjectSetupStep: React.FC = () => {
   const [aiAnalysis, setAiAnalysis] = useState<ProjectAnalysis | null>(null);
   const [showAiSuggestions, setShowAiSuggestions] = useState(false);
 
-  const {
-    analyzeProject,
-    isAnalyzing,
-    analysisError,
-    isUsingFallback,
-  } = useAnalyzeProject();
+  const { analyzeProject, isAnalyzing, analysisError, isUsingFallback } = useAnalyzeProject();
 
   /**
    * Trigger AI analysis when description reaches 20 characters

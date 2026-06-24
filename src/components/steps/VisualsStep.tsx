@@ -1,22 +1,22 @@
 import React from 'react';
-import { useBoltBuilder } from '../../contexts/BoltBuilderContext';
+import { useBoltBuilderStore } from '../../stores/boltBuilderStore';
 import { visualTypes } from '../../data/wizardData';
 import { VisualElement } from '../../types';
 import { Button } from '../ui/button';
 import VisualCard from '../cards/VisualCard';
 
 const VisualsStep: React.FC = () => {
-  const { selectedVisuals, setSelectedVisuals, setCurrentStep } = useBoltBuilder();
+  const { selectedVisuals, setSelectedVisuals, setCurrentStep } = useBoltBuilderStore();
 
   const handleVisualSelect = (typeId: string, optionId: string) => {
     setSelectedVisuals((prev: VisualElement[]) => [
       ...prev.filter((v: VisualElement) => v.id !== typeId),
-      { id: typeId, type: typeId, style: optionId }
+      { id: typeId, type: typeId, style: optionId },
     ]);
   };
 
   const isSelected = (typeId: string, optionId: string): boolean => {
-    return selectedVisuals.some(v => v.id === typeId && v.style === optionId);
+    return selectedVisuals.some((v) => v.id === typeId && v.style === optionId);
   };
 
   const handleContinue = () => {
@@ -28,7 +28,9 @@ const VisualsStep: React.FC = () => {
       {/* Header */}
       <div>
         <h2 className="text-3xl font-bold mb-2 text-white">Choose Your Visuals</h2>
-        <p className="text-gray-300">Select visual elements that will enhance your website's appearance and user experience.</p>
+        <p className="text-gray-300">
+          Select visual elements that will enhance your website's appearance and user experience.
+        </p>
       </div>
 
       {/* Visual Types */}
@@ -37,10 +39,15 @@ const VisualsStep: React.FC = () => {
           <div key={type.id} className="space-y-6">
             <div className="flex items-center gap-4">
               <div className="w-8 h-8 text-white/80">
-                <svg className="w-full h-full" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                  <rect width="18" height="18" x="3" y="3" rx="2" ry="2"/>
-                  <circle cx="9" cy="9" r="2"/>
-                  <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/>
+                <svg
+                  className="w-full h-full"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                >
+                  <rect width="18" height="18" x="3" y="3" rx="2" ry="2" />
+                  <circle cx="9" cy="9" r="2" />
+                  <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21" />
                 </svg>
               </div>
               <div>
@@ -48,7 +55,7 @@ const VisualsStep: React.FC = () => {
                 <p className="text-sm text-gray-300">{type.description}</p>
               </div>
             </div>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
               {type.options.map((option) => (
                 <VisualCard
@@ -66,17 +73,11 @@ const VisualsStep: React.FC = () => {
 
       {/* Navigation */}
       <div className="flex justify-between pt-8">
-        <Button 
-          onClick={() => setCurrentStep('typography')}
-          variant="outline"
-        >
+        <Button onClick={() => setCurrentStep('typography')} variant="outline">
           Back to Typography
         </Button>
-        
-        <Button 
-          onClick={handleContinue}
-          className="bg-teal-600 hover:bg-teal-700 text-white"
-        >
+
+        <Button onClick={handleContinue} className="bg-teal-600 hover:bg-teal-700 text-white">
           Continue to Background
         </Button>
       </div>

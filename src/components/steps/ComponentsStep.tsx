@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { useBoltBuilder } from '../../contexts/BoltBuilderContext';
+import { useBoltBuilderStore } from '../../stores/boltBuilderStore';
 import { componentOptions as reactBitsComponents } from '../../data/react-bits';
 import { ComponentOption } from '../../types';
 import { Button } from '../ui/button';
@@ -21,7 +21,8 @@ const COMPONENT_TAGS = Array.from(
 ).sort();
 
 const ComponentsStepContent: React.FC = () => {
-  const { selectedComponents, setSelectedComponents, setCurrentStep, selectedFunctionality } = useBoltBuilder();
+  const { selectedComponents, setSelectedComponents, setCurrentStep, selectedFunctionality } =
+    useBoltBuilderStore();
   const [currentPage, setCurrentPage] = useState(1);
   const [modalState, setModalState] = useState<{
     isOpen: boolean;
@@ -31,10 +32,10 @@ const ComponentsStepContent: React.FC = () => {
     option: null,
   });
   const [dataLoadError, setDataLoadError] = useState<boolean>(false);
-  
+
   // Get auto-selected component IDs from sessionStorage
   const [autoSelectedIds, setAutoSelectedIds] = useState<string[]>([]);
-  
+
   React.useEffect(() => {
     try {
       const stored = sessionStorage.getItem('autoSelectedComponents');

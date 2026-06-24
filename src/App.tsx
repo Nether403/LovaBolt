@@ -1,13 +1,21 @@
-import { lazy, Suspense } from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { lazy, Suspense, useEffect, useRef } from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { BoltBuilderProvider } from './contexts/BoltBuilderContext';
+import { useBoltBuilderStore } from './stores/boltBuilderStore';
+import { startWizardSession, updateWizardStep } from './utils/metricsTracking';
 import ErrorBoundary from './components/ErrorBoundary';
 import WelcomePage from './components/WelcomePage';
 import WizardLayout from './components/WizardLayout';
 import { SkipLink } from './components/accessibility/SkipLink';
-import { AnalyticsDashboardPage } from './components/AnalyticsDashboardPage';
 import { NetworkStatus } from './components/NetworkStatus';
+
+const ChatWelcome = lazy(() => import('./pages/ChatWelcome'));
+const SignInPage = lazy(() => import('./pages/auth/SignInPage'));
+const SignUpPage = lazy(() => import('./pages/auth/SignUpPage'));
+const AuthCallback = lazy(() => import('./pages/auth/AuthCallback'));
+const GalleryPage = lazy(() => import('./pages/gallery'));
+const SharedProjectPage = lazy(() => import('./pages/share/SharedProject'));
+const MyProjects = lazy(() => import('./pages/projects/MyProjects'));
 
 const FloatingLines = lazy(() => import('./components/ui/FloatingLines'));
 
@@ -50,34 +58,114 @@ function WebGLBackground() {
   );
 }
 
+function WizardSessionTracker() {
+  const currentStep = useBoltBuilderStore((s) => s.currentStep);
+  const sessionStartedRef = useRef(false);
+
+  // Start session tracking once on mount
+  useEffect(() => {
+    if (!sessionStartedRef.current) {
+      startWizardSession();
+      sessionStartedRef.current = true;
+    }
+  }, []);
+
+  // Sync step tracking when step changes
+  useEffect(() => {
+    updateWizardStep(currentStep);
+  }, [currentStep]);
+
+  return null;
+}
+
 function App() {
   return (
     <ErrorBoundary>
       <QueryClientProvider client={queryClient}>
-        <BoltBuilderProvider>
-          {/* Skip navigation links for accessibility */}
-          <SkipLink href="#main-content">Skip to main content</SkipLink>
-          <div className="min-h-screen bg-black overflow-hidden">
-            {/* Floating Lines Background */}
-            <div className="absolute inset-0 pointer-events-none" aria-hidden="true">
-              <WebGLBackground />
-            </div>
-
-            <div className="relative z-10">
-              <Router>
-                <Routes>
-                  <Route path="/" element={<WelcomePage />} />
-                  <Route path="/analytics" element={<AnalyticsDashboardPage />} />
-                  <Route path="/wizard" element={<WizardLayout />} />
-                  <Route path="/*" element={<WizardLayout />} />
-                </Routes>
-              </Router>
-            </div>
-
-            {/* Network status indicator for mobile optimization */}
-            <NetworkStatus />
+        <WizardSessionTracker />
+        {/* Skip navigation links for accessibility */}
+        <SkipLink href="#main-content">Skip to main content</SkipLink>
+        <div className="min-h-screen bg-black overflow-hidden">
+          {/* Floating Lines Background */}
+          <div className="absolute inset-0 pointer-events-none" aria-hidden="true">
+            <WebGLBackground />
           </div>
-        </BoltBuilderProvider>
+
+          <div className="relative z-10">
+            <Router>
+              <Routes>
+                <Route path="/" element={<WelcomePage />} />
+                <Route
+                  path="/chat"
+                  element={
+                    <Suspense fallback={<div className="min-h-screen bg-black" />}>
+                      <ChatWelcome />
+                    </Suspense>
+                  }
+                />
+                <Route
+                  path="/auth/sign-in"
+                  element={
+                    <Suspense fallback={<div className="min-h-screen bg-black" />}>
+                      <SignInPage />
+                    </Suspense>
+                  }
+                />
+                <Route
+                  path="/auth/sign-up"
+                  element={
+                    <Suspense fallback={<div className="min-h-screen bg-black" />}>
+                      <SignUpPage />
+                    </Suspense>
+                  }
+                />
+                <Route
+                  path="/auth/callback"
+                  element={
+                    <Suspense fallback={<div className="min-h-screen bg-black" />}>
+                      <AuthCallback />
+                    </Suspense>
+                  }
+                />
+                <Route path="/wizard" element={<WizardLayout />} />
+                {/* Convenience aliases for the common muscle-memory URLs so they
+                    don't fall through to the catch-all wizard route. */}
+                <Route path="/signin" element={<Navigate to="/auth/sign-in" replace />} />
+                <Route path="/signup" element={<Navigate to="/auth/sign-up" replace />} />
+                <Route path="/sign-in" element={<Navigate to="/auth/sign-in" replace />} />
+                <Route path="/sign-up" element={<Navigate to="/auth/sign-up" replace />} />
+                <Route
+                  path="/projects"
+                  element={
+                    <Suspense fallback={<div className="min-h-screen bg-black" />}>
+                      <MyProjects />
+                    </Suspense>
+                  }
+                />
+                <Route
+                  path="/share/:projectId"
+                  element={
+                    <Suspense fallback={<div className="min-h-screen bg-black" />}>
+                      <SharedProjectPage />
+                    </Suspense>
+                  }
+                />
+                <Route
+                  path="/gallery"
+                  element={
+                    <Suspense fallback={<div className="min-h-screen bg-black" />}>
+                      <GalleryPage />
+                    </Suspense>
+                  }
+                />
+                <Route path="/*" element={<WizardLayout />} />
+              </Routes>
+            </Router>
+          </div>
+
+          {/* Network status indicator for mobile optimization */}
+          <NetworkStatus />
+        </div>
       </QueryClientProvider>
     </ErrorBoundary>
   );

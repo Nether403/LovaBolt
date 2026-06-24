@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { useBoltBuilder } from '../../contexts/BoltBuilderContext';
+import { useBoltBuilderStore } from '../../stores/boltBuilderStore';
 import { animationOptions as reactBitsAnimations } from '../../data/react-bits';
 import { AnimationOption } from '../../types';
 import { Button } from '../ui/button';
@@ -21,7 +21,8 @@ const ANIMATION_TAGS = Array.from(
 ).sort();
 
 const AnimationsStepContent: React.FC = () => {
-  const { selectedAnimations, setSelectedAnimations, setCurrentStep, selectedDesignStyle } = useBoltBuilder();
+  const { selectedAnimations, setSelectedAnimations, setCurrentStep, selectedDesignStyle } =
+    useBoltBuilderStore();
   const [currentPage, setCurrentPage] = useState(1);
   const [modalState, setModalState] = useState<{
     isOpen: boolean;
